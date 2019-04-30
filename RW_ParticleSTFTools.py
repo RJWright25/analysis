@@ -11,7 +11,6 @@ if True:
     import time
     import h5py
 
-
     # VELOCIraptor python tools 
     from RW_VRTools import ReadPropertyFile
     from RW_VRTools import TraceMainProgen
@@ -20,22 +19,23 @@ if True:
     from RW_VRTools import BuildTemporalHeadTail
     from RW_VRTools import BuildTemporalHeadTailDescendant
     from RW_VRTools import ReadParticleDataFile
+    from RW_VRTools import ReadSOParticleDataFile
 
 ##########################################################################################################################################################################
 ########################################################################### READ PARTICLE DATA ###########################################################################
 ##########################################################################################################################################################################
 
-def read_swift_particle_data(run_directory,snap_no,part_type,data_fields=['Coordinates','Masses','ParticleIDs','Velocities'],verbose=1):
+def read_swift_particle_data(run_directory,snap_no=200,part_type=[0,1],data_fields=['Coordinates','Masses','ParticleIDs','Velocities'],verbose=1):
     
     ##### inputs
     # run_directory: STRING for directory of run
+    # snap_no: integer number of snaps to record from snap=0
     # parttype: LIST of INTEGER desired particle type
     # datafields: LIST of swift particle fields from ['Coordinates','Masses','ParticleIDs','Velocities']
-    # snaps: integer number of snaps 
 
     ##### returns
     # dictionary (snaps) of dictionaries (corresponding to each parttype) of dictionaries (corresponding to fields) -- masses in solar units, velocities in km/s, positions in Mpc
-    # e.g. particle_data['snap']['PartTypeX']['field'] where X is particle type integer
+    # e.g. particle_data[snap]['PartTypeX']['field'] where X is particle type integer
 
     snaps=[i for i in range(snap_no)]
 
@@ -43,7 +43,7 @@ def read_swift_particle_data(run_directory,snap_no,part_type,data_fields=['Coord
     particle_data=[[] for i in range(snap_no)]
     
     # load hdf5 files
-    particle_data_file_directories=[directory+"snap_"+str(snap).zfill(4)+".hdf5" for snap in snaps]
+    particle_data_file_directories=[run_directory+"snap_"+str(snap).zfill(4)+".hdf5" for snap in snaps]
     particle_data_files=[h5py.File(particle_data_file_directories[index]) for index in range(snap_no)]
 
     if verbose:
@@ -72,11 +72,36 @@ def read_swift_particle_data(run_directory,snap_no,part_type,data_fields=['Coord
     return particle_data
 
 
+# ##########################################################################################################################################################################
+# ################################################################# CREATE PARTICLE ID & TYPE LIST #########################################################################
+# ##########################################################################################################################################################################
+
+# def create_particle_type_catalogue(run_directory,snap_no=200):
+
+#     ##### inputs
+#     # run_directory: STRING for directory of run
+
+#     ##### returns
+#     # dictionary of 'Particle_IDs' and 'Particle_Types'
+#     # e.g. part_catalogue['Particle_IDs'] and part_catalogue['Particle_Type']
+#     part_data=read_swift_particle_data(run_directory,snap_no=snap_no,part_type=[0,1],data_fields=['Coordinates','Masses','ParticleIDs','Velocities'],verbose=1)
+
+#     print('Recording particle types for each snap')
+
+#     part_IDs_0=[part_data[snap]['PartType0']['ParticleIDs'] for snap in range(snap_no)]#take ids at each snapshot -pt0
+#     part_IDs_1=[part_data[snap]['PartType1']['ParticleIDs'] for snap in range(snap_no)]#take ids at each snapshot -pt1
+
+#     part_catalogue=[part_IDs_0,part_IDs_1]
+
+#     print('Finished recording particle types for each snap')
+
+#     return(part_catalogue)
+
 ##########################################################################################################################################################################
 ########################################################################## CREATE HALO DATA & LINKS ######################################################################
 ##########################################################################################################################################################################
 
-def read_vr_treefrog_data(vr_directory,snap_no,extra_halo_fields=[],halo_TEMPORALHALOIDVAL=1000000,verbose=1):
+def read_vr_treefrog_data(vr_directory,snap_no,part_data_from_snap=120,extra_halo_fields=[],halo_TEMPORALHALOIDVAL=1000000,verbose=1):
     # reads velociraptor and treefrog outputs with desired data fields (always includes ['ID','hostHaloID','numSubStruct','Mass_tot','Mass_200crit','M_gas','Xc','Yc','Zc','R_200crit'])
 
     ##### inputs
@@ -84,10 +109,10 @@ def read_vr_treefrog_data(vr_directory,snap_no,extra_halo_fields=[],halo_TEMPORA
     # snap_no: INTEGER number of snapshots in simulation (needs ALL to create merger trees etc)
     # datafields: LIST of halo data fields from VR STF output (on top of the defaults)
     # snaps: LIST of INTEGER SNAPS
-    # halo_TEMPORALHALOIDVAL: from VR (default sim_1_TEMPORALHALOIDVAL=1000000)
+    # halo_TEMPORALHALOIDVAL: from VR (default halo_TEMPORALHALOIDVAL=1000000)
 
     ##### returns
-    # list (for each snap) of dictionaries (each field) containing field data for each halo
+    # list (for each snap) of dictionaries (each field) containing field data for each halo AND concatenated particle lists for each halo
 
     sim_snaps=[i for i in range(snap_no)]
 
@@ -122,21 +147,24 @@ def read_vr_treefrog_data(vr_directory,snap_no,extra_halo_fields=[],halo_TEMPORA
 
     if verbose==1:
         print('Finished assembling descendent tree using VR python tools')
-
-    part_data_all = [[] for i in range(snap_no)]
     
     if verbose==1:
         print('Adding particle lists to halos using VR python tools')
+    
 
     for snap in sim_snaps: #iterate through snaps to add particle data to halo_data_all structure
-        try:#if there are halos
-            part_data_temp=ReadParticleDataFile(vr_directory+'SWIFT-L25_N64-Gas-stfout-snap_'+str(snap).zfill(4),ibinary=2,iseparatesubfiles=0,iverbose=0)
+
+        n_halos=len(halo_data_all[snap]['ID'])
+
+        if snap>part_data_from_snap:#if there are a good amount of halos and snap late enough
+            part_data_temp=ReadParticleDataFile(vr_directory+'SWIFT-L25_N64-Gas-stfout-snap_'+str(snap).zfill(4),ibinary=2,iverbose=0,iparttypes=1)
             for part_key in list(part_data_temp.keys()):
                 halo_data_all[snap][part_key]=part_data_temp[part_key]
-        except:#if there are no halos
-            part_data_temp={"Npart":[],"Npart_unbound":[],'Particle_IDs':[]}
+
+        else:#if we don't have particle data yet
+            part_data_temp={"Npart":[],"Npart_unbound":[],'Particle_IDs':[],'Particle_Type':[]}
             for part_key in list(part_data_temp.keys()):
-                halo_data_all[snap][part_key]=part_data_temp[part_key]   
+                halo_data_all[snap][part_key]=part_data_temp[part_key] 
 
     if verbose==1:
         print('Finished adding particle lists to halos using VR python tools')
@@ -152,12 +180,17 @@ def read_vr_treefrog_data(vr_directory,snap_no,extra_halo_fields=[],halo_TEMPORA
         if len(field_halo_indices_temp)>0:#where there are field halos
             for field_halo_ID in halo_data_temp['ID'][field_halo_indices_temp]:#go through each field halo
                 sub_halos_temp=(np.where(halo_data_temp['hostHaloID']==field_halo_ID)[0])#find its subhalos
-
                 if len(sub_halos_temp)>0:#where there is substructure
-                    sub_halos_plist=np.concatenate([halo_data_temp['Particle_IDs'][isub] for isub in sub_halos_temp])#list all particles in substructure
                     field_halo_temp_index=np.where(halo_data_temp['ID']==field_halo_ID)[0][0]
+                    
                     field_halo_plist=halo_data_temp['Particle_IDs'][field_halo_temp_index]
+                    field_halo_tlist=halo_data_temp['Particle_Types'][field_halo_temp_index]
+                    sub_halos_plist=np.concatenate([halo_data_temp['Particle_IDs'][isub] for isub in sub_halos_temp])#list all particles IDs in substructure
+                    sub_halos_tlist=np.concatenate([halo_data_temp['Particle_Types'][isub] for isub in sub_halos_temp])#list all particles types substructure
+
                     halo_data_temp['Particle_IDs'][field_halo_temp_index]=np.concatenate([field_halo_plist,sub_halos_plist])#add particles to field halo particle list
+                    halo_data_temp['Particle_Types'][field_halo_temp_index]=np.concatenate([field_halo_tlist,sub_halos_tlist])#add particles to field halo particle list
+                    halo_data_temp['Npart'][field_halo_temp_index]=len(halo_data_temp['Particle_IDs'][field_halo_temp_index])#update Npart for each field halo
 
     if verbose==1:
         print('Finished appending FOF particle lists with substructure')

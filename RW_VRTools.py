@@ -825,6 +825,8 @@ def ReadParticleDataFile(basefilename,ibinary=0,iseparatesubfiles=0,iparttypes=0
 				uoffset=np.uint64(gfile["Offset_unbound"])
 				gfile.close()
 				pfile = h5py.File(pfilename, 'r')
+				#print(pfilename)
+				#print(list(pfile.keys()))
 				upfile = h5py.File(upfilename, 'r')
 				piddata=np.int64(pfile["Particle_IDs"])
 				upiddata=np.int64(upfile["Particle_IDs"])
@@ -836,8 +838,8 @@ def ReadParticleDataFile(basefilename,ibinary=0,iseparatesubfiles=0,iparttypes=0
 				if (iparttypes==1):
 					tfile = h5py.File(tfilename, 'r')
 					utfile = h5py.File(utfilename, 'r')
-					tdata=np.uint16(pfile["Particle_Types"])
-					utdata=np.uint16(upfile["Particle_Types"])
+					tdata=np.uint16(tfile["Particle_types"])
+					utdata=np.uint16(utfile["Particle_types"])
 					tfile.close()
 					utfile.close()
 
@@ -846,7 +848,7 @@ def ReadParticleDataFile(basefilename,ibinary=0,iseparatesubfiles=0,iparttypes=0
 			particledata['Npart'][counter:counter+numhalos]=numingroup
 			unumingroup=np.zeros(numhalos,dtype=np.uint64)
 			for i in range(int(numhalos-1)):
-				unumingroup[i]=(uoffset[i+1]-uoffset[i]);
+				unumingroup[i]=(uoffset[i+1]-uoffset[i])
 			unumingroup[-1]=(unpart-uoffset[-1])
 			particledata['Npart_unbound'][counter:counter+numhalos]=unumingroup
 			for i in range(numhalos):
@@ -1192,7 +1194,6 @@ def BuildTemporalHeadTail(numsnaps,tree,numhalos,halodata,TEMPORALHALOIDVAL=1000
 					#store the tail of the next head
 					headtailid,headtailsnap=halodata[headsnap]['Tail'][headindex],halodata[headsnap]['TailSnap'][headindex]
 	print("Done building", time.clock()-totstart)
-
 
 def TraceMainDescendant(istart,ihalo,numsnaps,numhalos,halodata,tree,TEMPORALHALOIDVAL,ireverseorder=False):
 	"""
