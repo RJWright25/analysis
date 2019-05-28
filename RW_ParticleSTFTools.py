@@ -22,7 +22,12 @@ if True:
 ########################################################################### READ PARTICLE DATA ###########################################################################
 ##########################################################################################################################################################################
 
-def read_sim_timesteps(run_directory,fields=['Lookback time [internal units]','Redshift','Scale-factor'],snap_no=200):
+def read_sim_timesteps(run_directory,sim_type='SWIFT',snap_no=200,file_lz=4):
+    if sim_type=='SWIFT':
+        fields=['Lookback time [internal units]','Redshift','Scale-factor']
+    if sim_type=='GADGET':
+        fields=['Lookback time [internal units]','Redshift','Scale-factor']
+        
     ##### inputs
     # run directory: STRING for directory of run
 
@@ -30,7 +35,7 @@ def read_sim_timesteps(run_directory,fields=['Lookback time [internal units]','R
     # dictionary: lookback time, expansion factor, redshift for each snap (starting at snap = 0)
 
     snaps=[i for i in range(snap_no)]
-    particle_data_file_directories=[run_directory+"snap_"+str(snap).zfill(4)+".hdf5" for snap in snaps]
+    particle_data_file_directories=[run_directory+"snap_"+str(snap).zfill(file_lz)+".hdf5" for snap in snaps]
     sim_timesteps={'Lookback_time':[],'Redshift':[],'Scale_factor':[]}
     fields_out=list(sim_timesteps.keys())
 
