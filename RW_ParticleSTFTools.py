@@ -7,6 +7,7 @@ if True:
     import matplotlib.pyplot as plt
     import numpy as np
     import h5py
+    from astropy.cosmology import FlatLambdaCDM
 
     # VELOCIraptor python tools 
     from RW_VRTools import ReadPropertyFile
@@ -22,34 +23,56 @@ if True:
 ########################################################################### READ PARTICLE DATA ###########################################################################
 ##########################################################################################################################################################################
 
-def read_sim_timesteps(run_directory,sim_type='SWIFT',snap_no=200,file_lz=4):
-    if sim_type=='SWIFT':
-        fields=['Lookback time [internal units]','Redshift','Scale-factor']
-    if sim_type=='GADGET':
-        fields=['Lookback time [internal units]','Redshift','Scale-factor']
-        
+def read_sim_timesteps(run_directory,sim_type='SWIFT',snap_no=200,files_lz=4):
     ##### inputs
     # run directory: STRING for directory of run
 
     ##### returns
     # dictionary: lookback time, expansion factor, redshift for each snap (starting at snap = 0)
 
-    snaps=[i for i in range(snap_no)]
-    particle_data_file_directories=[run_directory+"snap_"+str(snap).zfill(file_lz)+".hdf5" for snap in snaps]
-    sim_timesteps={'Lookback_time':[],'Redshift':[],'Scale_factor':[]}
-    fields_out=list(sim_timesteps.keys())
+    if sim_type=='SWIFT':
+        fields=['Lookback time [internal units]','Redshift','Scale-factor']
+        prefix="snap_"
 
-    for snap in snaps:
-        particle_file_temp=h5py.File(particle_data_file_directories[snap])
-        time_unit=particle_file_temp['Units'].attrs['Unit time in cgs (U_t)']
-        for ifield,field in enumerate(fields):
-            if ifield==0:
-                sim_timesteps[fields_out[ifield]].extend(particle_file_temp['Cosmology'].attrs[field]*time_unit/(3600*24*365.25*10**9))
-            else:
-                sim_timesteps[fields_out[ifield]].extend(particle_file_temp['Cosmology'].attrs[field])
-        particle_file_temp.close()
-    
-    return sim_timesteps
+        snaps=[i for i in range(snap_no)]
+        particle_data_file_directories=[run_directory+prefix+str(snap).zfill(files_lz)+".hdf5" for snap in snaps]
+
+        sim_timesteps={'Lookback_time':[],'Redshift':[],'Scale_factor':[]}
+        fields_out=list(sim_timesteps.keys())
+
+        for snap in snaps:
+            particle_file_temp=h5py.File(particle_data_file_directories[snap])
+            time_unit=particle_file_temp['Units'].attrs['Unit time in cgs (U_t)']
+            for ifield,field in enumerate(fields):
+                if ifield==0:
+                    sim_timesteps[fields_out[ifield]].extend(particle_file_temp['Cosmology'].attrs[field]*time_unit/(3600*24*365.25*10**9))
+                else:
+                    sim_timesteps[fields_out[ifield]].extend(particle_file_temp['Cosmology'].attrs[field])
+            particle_file_temp.close()
+
+    if sim_type=='GADGET':
+        fields=['Redshift','Time']
+        prefix="snapshot_"
+        particle_file_temp=run_directory+prefix+str(0).zfill(files_lz)+".hdf5"
+
+        H0=particle_file_temp['Header'].attrs['HubbleParam']*100
+        Om0=particle_file_temp['Header'].attrs['Omega0']     
+        cosmo=FlatLambdaCDM(H0=H0,Om0=Om0)
+
+        snaps=[i for i in range(snap_no)]
+        particle_data_file_directories=[run_directory+prefix+str(snap).zfill(files_lz)+".hdf5" for snap in snaps]
+
+        sim_timesteps={'Redshift':[],'Scale_factor':[]}
+        fields_out=list(sim_timesteps.keys())
+        
+        for snap in snaps:
+            particle_file_temp=h5py.File(particle_data_file_directories[snap])
+            for ifield,field in enumerate(fields):
+                    sim_timesteps[fields_out[ifield]].extend(particle_file_temp['Header'].attrs[field])
+            particle_file_temp.close()
+
+        sim_timesteps['Lookback_time']=cosmo.lookback_time(sim_timesteps['Redshift'])
+        return sim_timesteps
 
 def read_swift_particle_data(run_directory,snap_no=200,part_type=[0,1],data_fields=['Coordinates','Masses','ParticleIDs','Velocities'],verbose=1):
     
@@ -101,7 +124,7 @@ def read_swift_particle_data(run_directory,snap_no=200,part_type=[0,1],data_fiel
 ############################################################################## CREATE HALO DATA ##########################################################################
 ##########################################################################################################################################################################
 
-def read_vr_treefrog_data(vr_directory,snap_no,part_data_from_snap=120,extra_halo_fields=[],halo_TEMPORALHALOIDVAL=1000000,verbose=1):
+def read_vr_treefrog_data(vr_directory,vr_prefix,tf_directory,tf_name,files_type=2,files_nested=False,files_lz=4,snap_no=200,part_data_from_snap=120,extra_halo_fields=[],halo_TEMPORALHALOIDVAL=1000000,verbose=1):
     # reads velociraptor and treefrog outputs with desired data fields (always includes ['ID','hostHaloID','numSubStruct','Mass_tot','Mass_200crit','M_gas','Xc','Yc','Zc','R_200crit'])
 
     ##### inputs
@@ -122,7 +145,10 @@ def read_vr_treefrog_data(vr_directory,snap_no,part_data_from_snap=120,extra_hal
         print('Reading halo data using VR python tools')
 
     # Load data from all desired snaps into list structure
-    halo_data_all=[ReadPropertyFile(vr_directory+'SWIFT-L25_N64-Gas-stfout-snap_'+str(snap).zfill(4),ibinary=2,iseparatesubfiles=0,iverbose=0, desiredfields=halo_fields, isiminfo=True, iunitinfo=True) for snap in sim_snaps]
+    if files_nested==False:
+        halo_data_all=[ReadPropertyFile(vr_directory+vr_prefix+str(snap).zfill(files_lz),ibinary=files_type,iseparatesubfiles=0,iverbose=0, desiredfields=halo_fields, isiminfo=True, iunitinfo=True) for snap in sim_snaps]
+    else:
+        halo_data_all=[ReadPropertyFile(vr_directory+vr_prefix+str(snap).zfill(files_lz)+"/"+vr_prefix+str(snap).zfill(files_lz),ibinary=files_type,iseparatesubfiles=0,iverbose=0, desiredfields=halo_fields, isiminfo=True, iunitinfo=True) for snap in sim_snaps]
 
     if verbose==1:
         print('Finished reading halo data')
@@ -139,8 +165,8 @@ def read_vr_treefrog_data(vr_directory,snap_no,part_data_from_snap=120,extra_hal
     if verbose==1:
         print('Assembling descendent tree using VR python tools')
 
-    tf_treefile=vr_directory+"treefrog/listtreefiles_descen.txt"
-    halo_tree=ReadHaloMergerTreeDescendant(tf_treefile,ibinary=2,iverbose=0,imerit=True,inpart=False)
+    tf_treefile=tf_directory+tf_name
+    halo_tree=ReadHaloMergerTreeDescendant(tf_treefile,ibinary=files_type,iverbose=0,imerit=True,inpart=False)
     BuildTemporalHeadTailDescendant(snap_no,halo_tree,halo_data_counts,halo_data_all,iverbose=0,TEMPORALHALOIDVAL=halo_TEMPORALHALOIDVAL)
 
     if verbose==1:
@@ -155,7 +181,11 @@ def read_vr_treefrog_data(vr_directory,snap_no,part_data_from_snap=120,extra_hal
         n_halos=len(halo_data_all[snap]['ID'])
 
         if snap>part_data_from_snap:#if there are a good amount of halos and snap late enough
-            part_data_temp=ReadParticleDataFile(vr_directory+'SWIFT-L25_N64-Gas-stfout-snap_'+str(snap).zfill(4),ibinary=2,iverbose=0,iparttypes=1)
+            if files_nested==False:
+                part_data_temp=ReadParticleDataFile(vr_directory+vr_prefix+str(snap).zfill(files_lz),ibinary=files_type,iverbose=0,iparttypes=1)
+            else:
+                part_data_temp=ReadParticleDataFile(vr_directory+vr_prefix+str(snap).zfill(files_lz)+"/"+vr_prefix+str(snap).zfill(files_lz),ibinary=files_type,iverbose=0,iparttypes=1)
+
             for part_key in list(part_data_temp.keys()):
                 halo_data_all[snap][part_key]=part_data_temp[part_key]
 
@@ -258,7 +288,7 @@ def gen_part_history(halo_data,verbose=True):
 ############################################################################## CALC DELTA_N ##############################################################################
 ##########################################################################################################################################################################
 
-def gen_delta_npart(halo_data,sim_timesteps,unique_particle_list=[],snaps=list(range(120,200,199)),depth=5,trim_hoes=True,verbose=True): 
+def gen_delta_npart(halo_data,sim_timesteps,type_order,mass_table,unique_particle_list=[],snaps=list(range(120,200,199)),depth=5,trim_hoes=True,verbose=True): 
 
     ##### inputs
     # halo_data (from above - needs particle lists)
@@ -371,11 +401,17 @@ def gen_delta_npart(halo_data,sim_timesteps,unique_particle_list=[],snaps=list(r
 
             if halo_tracked[ihalo]:
                 delta_n_tot[ihalo]=len(new_particle_IDs)
+                
                 ##### CHANGE HERE IF WE GET MORE PARTICLE TYPES
-                m_gas=0.120351*10**10 #MSol
-                m_dm=0.644648*10**10 #MSol
-                delta_m0[ihalo]=np.sum(new_particle_types==0)*m_dm
-                delta_m1[ihalo]=np.sum(new_particle_types==1)*m_gas
+                m_gas=mass_table[1]*10**10 #MSol
+                m_dm=mass_table[0]*10**10 #MSol
+
+                if type_order==1:
+                    delta_m0[ihalo]=np.sum(new_particle_types==0)*m_dm
+                    delta_m1[ihalo]=np.sum(new_particle_types==1)*m_gas
+                else:
+                    delta_m0[ihalo]=np.sum(new_particle_types==1)*m_dm
+                    delta_m1[ihalo]=np.sum(new_particle_types==0)*m_gas
 
         delta_t=abs(sim_timesteps['Lookback_time'][snap]-sim_timesteps['Lookback_time'][snap-depth])
         halo_data[snap]['delta_m0_dt']=delta_m0/delta_t
