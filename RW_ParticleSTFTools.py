@@ -4,7 +4,6 @@
 #*** Packages ***
 
 if True:
-    import RW_PlotParams
     import matplotlib.pyplot as plt
     import numpy as np
     import h5py
@@ -22,6 +21,30 @@ if True:
 ##########################################################################################################################################################################
 ########################################################################### READ PARTICLE DATA ###########################################################################
 ##########################################################################################################################################################################
+
+def read_sim_timesteps(run_directory,fields=['Lookback time [internal units]','Redshift','Scale-factor'],snap_no=200):
+    ##### inputs
+    # run directory: STRING for directory of run
+
+    ##### returns
+    # dictionary: lookback time, expansion factor, redshift for each snap (starting at snap = 0)
+
+    snaps=[i for i in range(snap_no)]
+    particle_data_file_directories=[run_directory+"snap_"+str(snap).zfill(4)+".hdf5" for snap in snaps]
+    sim_timesteps={'Lookback_time':[],'Redshift':[],'Scale_factor':[]}
+    fields_out=list(sim_timesteps.keys())
+
+    for snap in snaps:
+        particle_file_temp=h5py.File(particle_data_file_directories[snap])
+        time_unit=particle_file_temp['Units'].attrs['Unit time in cgs (U_t)']
+        for ifield,field in enumerate(fields):
+            if ifield==0:
+                sim_timesteps[fields_out[ifield]].extend(particle_file_temp['Cosmology'].attrs[field]*time_unit/(3600*24*365.25*10**9))
+            else:
+                sim_timesteps[fields_out[ifield]].extend(particle_file_temp['Cosmology'].attrs[field])
+        particle_file_temp.close()
+    
+    return sim_timesteps
 
 def read_swift_particle_data(run_directory,snap_no=200,part_type=[0,1],data_fields=['Coordinates','Masses','ParticleIDs','Velocities'],verbose=1):
     
@@ -174,7 +197,7 @@ def read_vr_treefrog_data(vr_directory,snap_no,part_data_from_snap=120,extra_hal
 ############################################################################## CREATE PARTICLE HISTORIES #################################################################
 ##########################################################################################################################################################################
 
-def gen_part_history(halo_data):
+def gen_part_history(halo_data,verbose=True):
     ##### inputs
     # halo_data (from above - needs particle lists)
 
@@ -187,6 +210,9 @@ def gen_part_history(halo_data):
     field_part_ids=[[] for i in range(len(halo_data))]
 
     for snap in range(len(halo_data)):
+
+        if verbose==True:
+            print('Generating particle histories for snap = ',snap)
 
         if len(halo_data[snap]['Particle_IDs'])==0:#if no halos
             field_part_ids[snap]=[]
@@ -219,7 +245,7 @@ def gen_part_history(halo_data):
         sub_part_ids_unique[snap]=np.unique(sub_part_ids[snap])
         field_part_ids_unique[snap]=np.unique(field_part_ids[snap])
 
-    print('unique particles created')
+    print('Unique particle histories created')
     return [{"field_ids":field_part_ids_unique[snap],"sub_ids":sub_part_ids_unique[snap]} for snap in range(len(halo_data))]
 
 
@@ -227,84 +253,127 @@ def gen_part_history(halo_data):
 ############################################################################## CALC DELTA_N ##############################################################################
 ##########################################################################################################################################################################
 
-def gen_delta_npart_snap(halo_data,unique_particle_list=[],snap=199,trim_hoes=True):
+def gen_delta_npart(halo_data,sim_timesteps,unique_particle_list=[],snaps=list(range(120,200,199)),depth=5,trim_hoes=True,verbose=True): 
 
+    ##### inputs
+    # halo_data (from above - needs particle lists)
+    # snaps: list of snaps to consider
+    # trim_hoes: get rid of particles which have been part of structure before when calculating accretion rate?
+
+    ##### returns
+    # halo_data with delta_m0 and delta_m1 keys 
+
+    def find_progen_index(index_0,snap,depth):
+        id_0=halo_data[snap]['ID'][index_0]#the original id
+        tail_id=halo_data[snap]['Tail'][index_0]#the tail id
+        for idepth in range(1,depth+1,1):
+            new_id=tail_id #the new id from tail in last snap
+            if new_id in halo_data[snap-idepth]['ID']:
+                new_index=np.where(halo_data[snap-idepth]['ID']==new_id)[0][0] #what index in the previous snap does the new_id correspond to
+                tail_id=halo_data[snap-idepth]['Tail'][new_index] #the new id for next loop
+            else:
+                new_index=np.nan
+                return new_index
+             #new index at snap-depth
+        return new_index
+    # if we done have particle lists, generate them now
     if unique_particle_list==[]:
-        unique_particle_list=gen_parthalohistory(halo_data)
+        if verbose==True:
+            print('Generating unique particle histories')
+        unique_particle_list=gen_part_history(halo_data)
 
-    part_IDs_2=halo_data[snap]['Particle_IDs']
-    part_Types_2=halo_data[snap]['Particle_Types']
+    # iterate through each snap
+    for snap in snaps:
+        if verbose==True:
+            print('Generating accretion rates for snap = ',snap)
+        
+        #final snap particle data
+        part_IDs_2=halo_data[snap]['Particle_IDs']
+        part_Types_2=halo_data[snap]['Particle_Types']
+        n_halo_2=len(halo_data[snap]['ID'])
+        halo_tracked=np.zeros(n_halo_2)
 
-    n_halo_2=len(halo_data[snap]['ID'])
+        #initial snap particle data
+        part_IDs_1=[[] for i in range(n_halo_2)]
+        part_Types_1=[[] for i in range(n_halo_2)]
 
-    part_IDs_1=[[] for i in range(n_halo_2)]
-    part_Types_1=[[] for i in range(n_halo_2)]
-    halo_tracked=np.empty(n_halo_2)
+        #if initial particle lists are empty
+        if halo_data[snap-depth]['Particle_IDs']==[] or snap-depth<0:
+            if verbose==True:
+                print('No particle lists found at initial snap = ',snap-depth)
+            #record empty data
+            for ihalo in range(n_halo_2):
+                halo_tracked=False
+                part_IDs_1[ihalo]=[]
+                part_Types_1[ihalo]=[]
+            continue
 
-    #for each z=0 halo, find previous particle list
-    for ihalo in range(n_halo_2):
-
-        tail_ID_temp=halo_data[snap]['Tail'][ihalo]#find progenitor
-
-        if tail_ID_temp in halo_data[snap-1]['ID']:
-            halo_tracked[ihalo]=True
-            index_1=np.where(tail_ID_temp==halo_data[snap-1]['ID'])[0][0]
-            part_IDs_1[ihalo]=halo_data[snap-1]['Particle_IDs'][index_1]
-            part_Types_1[ihalo]=halo_data[snap-1]['Particle_Types'][index_1]
-
+        #if we have initial particle list, find previous particle list
         else:
-            halo_tracked[ihalo]=False
-            part_IDs_1[ihalo]=[]
-            part_Types_1[ihalo]=[]
+            for ihalo in range(n_halo_2):
+                progen_index=find_progen_index(index_0=ihalo,snap=snap,depth=depth)
+                if progen_index>-1:
+                    part_IDs_1[ihalo]=halo_data[snap-depth]['Particle_IDs'][progen_index]
+                    part_Types_1[ihalo]=halo_data[snap-depth]['Particle_Types'][progen_index]
+                    halo_tracked[ihalo]=True
+                else:
+                    part_IDs_1[ihalo]=[]
+                    part_Types_1[ihalo]=[]
+                    halo_tracked[ihalo]=False
 
-    #now have part_IDs_1 and part_IDs_2
-    #now find accretion rate
+        #now have part_IDs_1 and part_IDs_2
 
-    delta_n_tot=[np.nan for i in range(n_halo_2)]
-    delta_m_dm=[np.nan for i in range(n_halo_2)]
-    delta_m_gas=[np.nan for i in range(n_halo_2)]
-    field_halo=[[] for i in range(n_halo_2)]
+        #now find accretion rate
+        delta_n_tot=[np.nan for i in range(n_halo_2)]
+        delta_m0=[np.nan for i in range(n_halo_2)]
+        delta_m1=[np.nan for i in range(n_halo_2)]
+        field_halo=[[] for i in range(n_halo_2)]
 
-    substructure_partID_list_uptosnap=unique_particle_list[snap-1]["sub_ids"]
-    structure_partID_list_uptosnap=unique_particle_list[snap-1]["field_ids"]
+        substructure_partID_list_uptosnap=unique_particle_list[snap-1]["sub_ids"]
+        structure_partID_list_uptosnap=unique_particle_list[snap-1]["field_ids"]
 
-    for ihalo in range(n_halo_2):#for each z=0, find accretion rate
-        #print(ihalo/n_halo_2*100,'% done finding accretion rates')
-        field_halo[ihalo]=halo_data[snap]['hostHaloID'][ihalo]==-1#True if dealing with field, False if dealing with Sub
+        for ihalo in range(n_halo_2):#for each z=0, find accretion rate
+            field_halo[ihalo]=halo_data[snap]['hostHaloID'][ihalo]==-1#True if dealing with field, False if dealing with Sub
+            part_IDs_init=part_IDs_1[ihalo]
+            part_IDs_final=part_IDs_2[ihalo]
+            part_Types_init=part_Types_1[ihalo]
+            part_Types_final=part_Types_2[ihalo]
 
-        part_IDs_init=part_IDs_1[ihalo]
-        part_IDs_final=part_IDs_2[ihalo]
-        part_Types_init=part_Types_1[ihalo]
-        part_Types_final=part_Types_2[ihalo]
+            new_particle_IDs=np.array(np.compress(np.logical_not(np.in1d(part_IDs_final,part_IDs_init)),part_IDs_final))
+            new_particle_types=np.array(np.compress(np.logical_not(np.in1d(part_IDs_final,part_IDs_init)),part_Types_final))
 
-        new_particle_IDs=np.array(np.compress(np.logical_not(np.in1d(part_IDs_final,part_IDs_init)),part_IDs_final))
-        new_particle_types=np.array(np.compress(np.logical_not(np.in1d(part_IDs_final,part_IDs_init)),part_Types_final))
 
-        if trim_hoes==True:#trim particles which have been part of substructure
-            if field_halo[ihalo]:#if a field halo
-                for ipart in range(len(new_particle_IDs)):#for each new particle
-                    part_ID_temp=new_particle_IDs[ipart]
-                    if part_ID_temp in structure_partID_list_uptosnap:#check if was ever in structure in the past
-                        new_particle_IDs[ipart]=-1#if so, remove ID. 
-                        new_particle_types[ipart]=-1
-            else:#if a subhalo
-                host_ID=halo_data[snap]['hostHaloID'][ihalo]
-                for ipart in range(len(new_particle_IDs)):#for each new particle
-                    part_ID_temp=new_particle_IDs[ipart]
-                    if part_ID_temp in substructure_partID_list_uptosnap:#check if was ever in substructure in the past
-                        new_particle_IDs[ipart]=-1#if so, remove ID. 
-                        new_particle_types[ipart]=-1
+            ################# TRIMMING PARTICLES #################
 
-            new_particle_IDs = np.compress(~(new_particle_IDs==-1),new_particle_IDs)
-            new_particle_types = np.compress(~(new_particle_IDs==-1),new_particle_types)
+            if trim_hoes==True:#trim particles which have been part of substructure
+                if field_halo[ihalo]:#if a field halo
+                    for ipart in range(len(new_particle_IDs)):#for each new particle
+                        part_ID_temp=new_particle_IDs[ipart]
+                        if part_ID_temp in structure_partID_list_uptosnap:#check if was ever in structure in the past
+                            new_particle_IDs[ipart]=-1#if so, remove ID. 
+                            new_particle_types[ipart]=-1
 
-        if halo_tracked[ihalo]:
-            delta_n_tot[ihalo]=len(new_particle_IDs)
+                else:#if a subhalo
+                    host_ID=halo_data[snap]['hostHaloID'][ihalo]
+                    for ipart in range(len(new_particle_IDs)):#for each new particle
+                        part_ID_temp=new_particle_IDs[ipart]
+                        if part_ID_temp in substructure_partID_list_uptosnap:#check if was ever in substructure in the past
+                            new_particle_IDs[ipart]=-1#if so, remove ID. 
+                            new_particle_types[ipart]=-1
 
-            ##### CHANGE HERE IF WE GET MORE PARTICLE TYPES
-            m_gas=0.120351*10**10 #MSol
-            m_dm=0.644648*10**10 #MSol
-            delta_m_dm[ihalo]=np.array(np.sum(new_particle_types==0))*m_dm
-            delta_m_gas[ihalo]=np.array(np.sum(new_particle_types==1))*m_gas
+                new_particle_IDs = np.compress(~(new_particle_IDs==-1),new_particle_IDs)
+                new_particle_types = np.compress(~(new_particle_IDs==-1),new_particle_types)
 
-    return {"dM_gas":delta_m_gas,"dM_dm":delta_m_dm,"halo_type":field_halo}
+            if halo_tracked[ihalo]:
+                delta_n_tot[ihalo]=len(new_particle_IDs)
+                ##### CHANGE HERE IF WE GET MORE PARTICLE TYPES
+                m_gas=0.120351*10**10 #MSol
+                m_dm=0.644648*10**10 #MSol
+                delta_m0[ihalo]=np.sum(new_particle_types==0)*m_dm
+                delta_m1[ihalo]=np.sum(new_particle_types==1)*m_gas
+
+        delta_t=abs(sim_timesteps['Lookback_time'][snap]-sim_timesteps['Lookback_time'][snap-depth])
+        halo_data[snap]['delta_m0_dt']=delta_m0/delta_t
+        halo_data[snap]['delta_m1_dt']=delta_m1/delta_t
+
+    return halo_data
