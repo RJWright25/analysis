@@ -1,11 +1,6 @@
 ### RW_Init: basic presets
 
-#import collections
-import functools
-import math
-import numpy as np
-import common
-import utilities_statistics as us
+import matplotlib
 import matplotlib.pyplot as plt
 import warnings
 import numpy as np
@@ -38,7 +33,7 @@ sim_fb=sim_mgas/(sim_mdm+sim_mgas)
 sim_timesteps=read_sim_timesteps(run_directory=run_directory,sim_type='GADGET',snap_no=201,files_lz=3)
 
 # Add delta_m0 and delta_m1 to each halo -- different trimming, different snap smoothing
-create_new=True
+create_new=False
 read_data=True
 
 ######## halo_data keys ----
