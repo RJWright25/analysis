@@ -208,7 +208,7 @@ def add_particle_lists(vr_directory,vr_prefix,halo_data_all,files_type=2,files_n
 
     for snap in sim_snaps:#iterate through snaps to add substructure particle lists to FOF halo particle
         if verbose==1:
-
+            print('Adding substructure particles to FOF halos for snap = ',snap)
 
         halo_data_temp=halo_data_all[snap]
         field_halo_indices_temp=np.where(halo_data_temp['hostHaloID']==-1)[0]#find field/fof halos
