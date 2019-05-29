@@ -65,20 +65,19 @@ sim_timesteps=read_sim_timesteps(run_directory=run_directory,sim_type='GADGET',s
 
 # Import BASE halo data + particle lists
 
-if False:#if we already have base halo data (nopl)
-    with open('halo_data_base_nopl.txt', 'rb') as halo_data_file:
-        halo_data_base_nopl = pickle.load(halo_data_file)
+if True:#if we want base halo data
+    halo_data_base=read_vr_treefrog_data(vr_directory=vr_directory,vr_prefix="snapshot_",tf_name=tf_treefile,snap_no=sim_no_snaps,files_lz=3,files_type=2,files_nested=True,extra_halo_fields=['npart'],verbose=1)
+    #once read, save this. 
+    with open('halo_data_base.txt', 'wb') as halo_data_file:
+        pickle.dump(halo_data_base, halo_data_file)
         halo_data_file.close()
-    halo_data_base=read_vr_treefrog_data(vr_directory=vr_directory,vr_prefix="snapshot_",halo_data_all=halo_data_base_nopl,tf_name=tf_treefile,snap_no=sim_no_snaps,files_lz=3,files_type=2,files_nested=True,extra_halo_fields=['npart'],verbose=1,part_data_from_snap=180)
-    #once read, save this. 
-    with open('halo_data_base.txt', 'wb') as halo_data_file:
-            pickle.dump(halo_data_base, halo_data_file)
-            halo_data_file.close()
             
-else:#if we DONT already have base halo data (nopl)
-    halo_data_base=read_vr_treefrog_data(vr_directory=vr_directory,vr_prefix="snapshot_",halo_data_all=halo_data_base_nopl,tf_name=tf_treefile,snap_no=sim_no_snaps,files_lz=3,files_type=2,files_nested=True,extra_halo_fields=['npart'],verbose=1,part_data_from_snap=180)
-    #once read, save this. 
-    with open('halo_data_base.txt', 'wb') as halo_data_file:
-            pickle.dump(halo_data_base, halo_data_file)
-            halo_data_file.close()
+# else:
+    
+    
+#         halo_data_base=read_vr_treefrog_data(vr_directory=vr_directory,vr_prefix="snapshot_",halo_data_all=halo_data_base_nopl,tf_name=tf_treefile,snap_no=sim_no_snaps,files_lz=3,files_type=2,files_nested=True,extra_halo_fields=['npart'],verbose=1,part_data_from_snap=180)
+#     #once read, save this. 
+#     with open('halo_data_base.txt', 'wb') as halo_data_file:
+#             pickle.dump(halo_data_base, halo_data_file)
+#             halo_data_file.close()
 
