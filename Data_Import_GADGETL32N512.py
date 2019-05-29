@@ -82,7 +82,7 @@ else:
 # Append particle lists
 
 if True:#if we want to make particle lists
-    halo_data_all=add_particle_lists(vr_directory=vr_directory,vr_prefix="snapshot_",halo_data_all=halo_data_base,files_type=2,files_nested=True,files_lz=3,part_data_from_snap=180,verbose=1):
+    halo_data_all=add_particle_lists(vr_directory=vr_directory,vr_prefix="snapshot_",halo_data_all=halo_data_base,files_type=2,files_nested=True,files_lz=3,part_data_from_snap=180,verbose=1)
     with open('halo_data_appended.txt', 'wb') as halo_data_file:
         pickle.dump(halo_data_all, halo_data_file)
         halo_data_file.close()
