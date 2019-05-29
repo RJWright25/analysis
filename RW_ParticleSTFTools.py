@@ -72,7 +72,7 @@ def read_sim_timesteps(run_directory,sim_type='SWIFT',snap_no=200,files_lz=4):
                 sim_timesteps[fields_out[ifield]][snap]=particle_file_temp['Header'].attrs[field]
             particle_file_temp.close()
 
-        sim_timesteps['Lookback_time']=cosmo.lookback_time(sim_timesteps['Redshift'])
+        sim_timesteps['Lookback_time']=cosmo.lookback_time(sim_timesteps['Redshift']).astype(float)
         return sim_timesteps
 
 def read_swift_particle_data(run_directory,snap_no=200,part_type=[0,1],data_fields=['Coordinates','Masses','ParticleIDs','Velocities'],verbose=1):
