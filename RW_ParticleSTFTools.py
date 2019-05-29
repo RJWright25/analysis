@@ -125,7 +125,7 @@ def read_swift_particle_data(run_directory,snap_no=200,part_type=[0,1],data_fiel
 ############################################################################## CREATE HALO DATA ##########################################################################
 ##########################################################################################################################################################################
 
-def read_vr_treefrog_data(vr_directory,vr_prefix,tf_name,halo_data_all=[],files_type=2,files_nested=False,files_lz=4,snap_no=200,part_data_from_snap=120,extra_halo_fields=[],halo_TEMPORALHALOIDVAL=1000000,verbose=1):
+def read_vr_treefrog_data(vr_directory,vr_prefix,tf_name,files_type=2,files_nested=False,files_lz=4,snap_no=200,extra_halo_fields=[],halo_TEMPORALHALOIDVAL=1000000,verbose=1):
     # reads velociraptor and treefrog outputs with desired data fields (always includes ['ID','hostHaloID','numSubStruct','Mass_tot','Mass_200crit','M_gas','Xc','Yc','Zc','R_200crit'])
 
     ##### inputs
@@ -146,13 +146,10 @@ def read_vr_treefrog_data(vr_directory,vr_prefix,tf_name,halo_data_all=[],files_
         print('Reading halo data using VR python tools')
 
     # Load data from all desired snaps into list structure
-    if halo_data_all==[]:
-        if files_nested==False:
-            halo_data_all=[ReadPropertyFile(vr_directory+vr_prefix+str(snap).zfill(files_lz),ibinary=files_type,iseparatesubfiles=0,iverbose=0, desiredfields=halo_fields, isiminfo=True, iunitinfo=True) for snap in sim_snaps]
-        else:
-            halo_data_all=[ReadPropertyFile(vr_directory+vr_prefix+str(snap).zfill(files_lz)+"/"+vr_prefix+str(snap).zfill(files_lz),ibinary=files_type,iseparatesubfiles=0,iverbose=0, desiredfields=halo_fields, isiminfo=True, iunitinfo=True) for snap in sim_snaps]
+    if files_nested==False:
+        halo_data_all=[ReadPropertyFile(vr_directory+vr_prefix+str(snap).zfill(files_lz),ibinary=files_type,iseparatesubfiles=0,iverbose=0, desiredfields=halo_fields, isiminfo=True, iunitinfo=True) for snap in sim_snaps]
     else:
-        halo_data_all=halo_data_all
+        halo_data_all=[ReadPropertyFile(vr_directory+vr_prefix+str(snap).zfill(files_lz)+"/"+vr_prefix+str(snap).zfill(files_lz),ibinary=files_type,iseparatesubfiles=0,iverbose=0, desiredfields=halo_fields, isiminfo=True, iunitinfo=True) for snap in sim_snaps]
 
     if verbose==1:
         print('Finished reading halo data')
@@ -173,9 +170,11 @@ def read_vr_treefrog_data(vr_directory,vr_prefix,tf_name,halo_data_all=[],files_
     halo_tree=ReadHaloMergerTreeDescendant(tf_treefile,ibinary=files_type,iverbose=1,imerit=True,inpart=False)
     BuildTemporalHeadTailDescendant(snap_no,halo_tree,halo_data_counts,halo_data_all,iverbose=0)
     
-    with open('halo_data_base_nopl.txt', 'wb') as halo_data_file:
-        pickle.dump(halo_data_all, halo_data_file)
-        halo_data_file.close()
+    return halo_data_all
+
+def add_particle_lists(vr_directory,vr_prefix,halo_data_all,files_type=2,files_nested=False,files_lz=4,part_data_from_snap=120,halo_TEMPORALHALOIDVAL=1000000,verbose=1):
+    snap_no=len(halo_data_all)
+    #save the no_pl data
 
     if verbose==1:
         print('Finished assembling descendent tree using VR python tools')
