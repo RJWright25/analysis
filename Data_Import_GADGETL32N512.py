@@ -24,8 +24,6 @@ sim_no_snaps=201
 sim_snaps=[i for i in range(sim_no_snaps)] #will track halos from last snap here
 sim_volume=32**3 #Mpc^3
 sim_z0_snap=sim_snaps[-1]
-
-
 sim_mdm=particle_file_temp['Header'].attrs['MassTable'][1]
 sim_mgas=particle_file_temp['Header'].attrs['MassTable'][0]
 sim_fb=sim_mgas/(sim_mdm+sim_mgas)
@@ -33,7 +31,7 @@ sim_fb=sim_mgas/(sim_mdm+sim_mgas)
 # Import BASE halo data + particle lists
 
 sim_timesteps=read_sim_timesteps(run_directory=run_directory,sim_type='GADGET',snap_no=201,files_lz=3)
-
+print(sim_timesteps)
 # Add delta_m0 and delta_m1 to each halo -- different trimming, different snap smoothing
 create_new=True
 read_data=True
