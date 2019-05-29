@@ -63,7 +63,9 @@ sim_timesteps=read_sim_timesteps(run_directory=run_directory,sim_type='GADGET',s
 # 'delta_m0_dt'
 # 'delta_m1_dt'
 
-# Import BASE halo data + particle lists
+
+
+# Import BASE halo data
 
 if True:#if we want base halo data
     halo_data_base=read_vr_treefrog_data(vr_directory=vr_directory,vr_prefix="snapshot_",tf_name=tf_treefile,snap_no=sim_no_snaps,files_lz=3,files_type=2,files_nested=True,extra_halo_fields=['npart'],verbose=1)
@@ -72,12 +74,23 @@ if True:#if we want base halo data
         pickle.dump(halo_data_base, halo_data_file)
         halo_data_file.close()
             
-# else:
-    
-    
-#         halo_data_base=read_vr_treefrog_data(vr_directory=vr_directory,vr_prefix="snapshot_",halo_data_all=halo_data_base_nopl,tf_name=tf_treefile,snap_no=sim_no_snaps,files_lz=3,files_type=2,files_nested=True,extra_halo_fields=['npart'],verbose=1,part_data_from_snap=180)
-#     #once read, save this. 
-#     with open('halo_data_base.txt', 'wb') as halo_data_file:
-#             pickle.dump(halo_data_base, halo_data_file)
-#             halo_data_file.close()
+else:
+    with open('halo_data_base.txt', 'rb') as halo_data_file:
+        halo_data_base=pickle.load(halo_data_file)
+        halo_data_file.close()
+
+# Append particle lists
+
+if True:#if we want to make particle lists
+    halo_data_all=add_particle_lists(vr_directory=vr_directory,vr_prefix="snapshot_",halo_data_all=halo_data_base,files_type=2,files_nested=True,files_lz=3,part_data_from_snap=180,verbose=1):
+    with open('halo_data_appended.txt', 'wb') as halo_data_file:
+        pickle.dump(halo_data_all, halo_data_file)
+        halo_data_file.close()
+else:#if we want to load particle lists
+    with open('halo_data_appended.txt', 'rb') as halo_data_file:
+        halo_data_all=pickle.load(halo_data_file)
+        halo_data_file.close()
+
+
+
 
