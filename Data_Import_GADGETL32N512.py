@@ -14,8 +14,8 @@ warnings.filterwarnings("ignore")
 # Data directories
 run_directory="/mnt/su3ctm/lbakels/CosmRun/9p/Hydro/nonrad/snapshots/"
 vr_directory="/mnt/su3ctm/lbakels/CosmRun/9p/Hydro/nonrad/VELOCIraptorG/"
-tf_directory="/mnt/su3ctm/lbakels/CosmRun/9p/Hydro/nonrad/TreeFrogG"
-tf_treefile="treesnaplist.txt"
+tf_directory="/mnt/su3ctm/lbakels/CosmRun/9p/Hydro/nonrad/TreeFrogG/"
+tf_treefile=tf_directory+"treesnaplist.txt"
 particle_file_temp=run_directory+"snapshot_"+str(0).zfill(3)+".hdf5"
 particle_file_temp=h5py.File(particle_file_temp)
 

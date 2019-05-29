@@ -149,8 +149,6 @@ def read_vr_treefrog_data(vr_directory,vr_prefix,tf_directory,tf_name,files_type
     if files_nested==False:
         halo_data_all=[ReadPropertyFile(vr_directory+vr_prefix+str(snap).zfill(files_lz),ibinary=files_type,iseparatesubfiles=0,iverbose=0, desiredfields=halo_fields, isiminfo=True, iunitinfo=True) for snap in sim_snaps]
     else:
-        halo_data_temp=ReadPropertyFile(vr_directory+vr_prefix+str(200).zfill(files_lz)+"/"+vr_prefix+str(200).zfill(files_lz),ibinary=files_type,iseparatesubfiles=0,iverbose=0, desiredfields=halo_fields, isiminfo=True, iunitinfo=True)
-        print(halo_data_temp)
         halo_data_all=[ReadPropertyFile(vr_directory+vr_prefix+str(snap).zfill(files_lz)+"/"+vr_prefix+str(snap).zfill(files_lz),ibinary=files_type,iseparatesubfiles=0,iverbose=0, desiredfields=halo_fields, isiminfo=True, iunitinfo=True) for snap in sim_snaps]
 
     if verbose==1:
