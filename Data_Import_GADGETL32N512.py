@@ -33,7 +33,7 @@ sim_fb=sim_mgas/(sim_mdm+sim_mgas)
 sim_timesteps=read_sim_timesteps(run_directory=run_directory,sim_type='GADGET',snap_no=201,files_lz=3)
 
 # Add delta_m0 and delta_m1 to each halo -- different trimming, different snap smoothing
-create_new=False
+create_new=True
 read_data=True
 
 ######## halo_data keys ----
