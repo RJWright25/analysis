@@ -168,7 +168,7 @@ def read_vr_treefrog_data(vr_directory,vr_prefix,tf_name,files_type=2,files_nest
 
     tf_treefile=tf_name
     halo_tree=ReadHaloMergerTreeDescendant(tf_treefile,ibinary=files_type,iverbose=1,imerit=True,inpart=False)
-    BuildTemporalHeadTailDescendant(snap_no,halo_tree,halo_data_counts,halo_data_all,iverbose=0,TEMPORALHALOIDVAL=halo_TEMPORALHALOIDVAL)
+    BuildTemporalHeadTailDescendant(snap_no,halo_tree,halo_data_counts,halo_data_all,iverbose=0)
 
     if verbose==1:
         print('Finished assembling descendent tree using VR python tools')

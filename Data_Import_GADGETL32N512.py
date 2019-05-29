@@ -72,7 +72,7 @@ read_data=True
 
 if read_data:
     if create_new:
-        halo_data_base=read_vr_treefrog_data(vr_directory=vr_directory,vr_prefix="snapshot_",tf_name=tf_treefile,snap_no=sim_no_snaps,files_lz=3,files_type=2,files_nested=True,extra_halo_fields=['npart'],halo_TEMPORALHALOIDVAL=100000000,verbose=1)
+        halo_data_base=read_vr_treefrog_data(vr_directory=vr_directory,vr_prefix="snapshot_",tf_name=tf_treefile,snap_no=sim_no_snaps,files_lz=3,files_type=2,files_nested=True,extra_halo_fields=['npart'],verbose=1)
         with open('halo_data_base.txt', 'wb') as halo_data_file:
             pickle.dump(halo_data_base, halo_data_file)
             halo_data_file.close()
