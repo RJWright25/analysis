@@ -68,7 +68,7 @@ def read_sim_timesteps(run_directory,sim_type='SWIFT',snap_no=200,files_lz=4):
         
         for snap in snaps:
             particle_file_temp=h5py.File(particle_data_file_directories[snap])
-            for ifield,field in fields):
+            for ifield,field in enumerate(fields):
                 print(list(particle_file_temp['Header'].attrs),fields_out[ifield])
                 print(particle_file_temp['Header'].attrs[field])
                 sim_timesteps[fields_out[ifield]].extend(particle_file_temp['Header'].attrs[field])
