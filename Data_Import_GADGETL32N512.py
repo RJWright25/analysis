@@ -16,14 +16,15 @@ run_directory="/mnt/su3ctm/lbakels/CosmRun/9p/Hydro/nonrad/snapshots/"
 vr_directory="/mnt/su3ctm/lbakels/CosmRun/9p/Hydro/nonrad/VELOCIraptorG/"
 tf_directory="/mnt/su3ctm/lbakels/CosmRun/9p/Hydro/nonrad/TreeFrogG"
 tf_treefile="treesnaplist.txt"
-particle_file_temp=run_directory+"snap"+str(0).zfill(3)+".hdf5"
-
+particle_file_temp=run_directory+"snapshot_"+str(0).zfill(3)+".hdf5"
+particle_file_temp=h5py.File(particle_file_temp)
 
 #Simulation variables
 sim_no_snaps=201
 sim_snaps=[i for i in range(sim_no_snaps)] #will track halos from last snap here
 sim_volume=32**3 #Mpc^3
 sim_z0_snap=sim_snaps[-1]
+
 sim_mdm=particle_file_temp['Header']['MassTable'][1]
 sim_mgas=particle_file_temp['Header']['MassTable'][0]
 sim_fb=sim_mgas/(sim_mdm+sim_mgas)

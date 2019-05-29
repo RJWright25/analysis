@@ -54,6 +54,7 @@ def read_sim_timesteps(run_directory,sim_type='SWIFT',snap_no=200,files_lz=4):
         fields=['Redshift','Time']
         prefix="snapshot_"
         particle_file_temp=run_directory+prefix+str(0).zfill(files_lz)+".hdf5"
+        particle_file_temp=h5py.File(particle_file_temp)
 
         H0=particle_file_temp['Header'].attrs['HubbleParam']*100
         Om0=particle_file_temp['Header'].attrs['Omega0']     
