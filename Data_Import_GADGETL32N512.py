@@ -1,12 +1,16 @@
 ### RW_Init: basic presets
 
-import matplotlib
+#import collections
+import functools
+import math
+import numpy as np
+import common
+import utilities_statistics as us
 import matplotlib.pyplot as plt
 import warnings
 import numpy as np
 import h5py
 import pickle
-import splotch
 from RW_GenPythonTools import *
 from RW_ParticleSTFTools import *
 from RW_VRTools import *
