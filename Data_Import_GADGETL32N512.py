@@ -31,7 +31,7 @@ sim_fb=sim_mgas/(sim_mdm+sim_mgas)
 # Import BASE halo data + particle lists
 
 sim_timesteps=read_sim_timesteps(run_directory=run_directory,sim_type='GADGET',snap_no=201,files_lz=3)
-print(sim_timesteps)
+
 # Add delta_m0 and delta_m1 to each halo -- different trimming, different snap smoothing
 create_new=True
 read_data=True
@@ -72,7 +72,7 @@ read_data=True
 
 if read_data:
     if create_new:
-        halo_data_base=read_vr_treefrog_data(vr_directory=vr_directory,vr_prefix="snapshot_",tf_directory=tf_directory,tf_name=tf_treefile,snap_no=sim_no_snaps,files_lz=3,files_type=0,files_nested=True,extra_halo_fields=['npart'],halo_TEMPORALHALOIDVAL=100000000,verbose=1)
+        halo_data_base=read_vr_treefrog_data(vr_directory=vr_directory,vr_prefix="snapshot_",tf_directory=tf_directory,tf_name=tf_treefile,snap_no=sim_no_snaps,files_lz=3,files_type=2,files_nested=True,extra_halo_fields=['npart'],halo_TEMPORALHALOIDVAL=100000000,verbose=1)
         with open('halo_data_base.txt', 'wb') as halo_data_file:
             pickle.dump(halo_data_base, halo_data_file)
             halo_data_file.close()
