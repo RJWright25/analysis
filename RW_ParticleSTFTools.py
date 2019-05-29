@@ -125,7 +125,7 @@ def read_swift_particle_data(run_directory,snap_no=200,part_type=[0,1],data_fiel
 ############################################################################## CREATE HALO DATA ##########################################################################
 ##########################################################################################################################################################################
 
-def read_vr_treefrog_data(vr_directory,vr_prefix,tf_directory,tf_name,files_type=2,files_nested=False,files_lz=4,snap_no=200,part_data_from_snap=120,extra_halo_fields=[],halo_TEMPORALHALOIDVAL=1000000,verbose=1):
+def read_vr_treefrog_data(vr_directory,vr_prefix,tf_name,files_type=2,files_nested=False,files_lz=4,snap_no=200,part_data_from_snap=120,extra_halo_fields=[],halo_TEMPORALHALOIDVAL=1000000,verbose=1):
     # reads velociraptor and treefrog outputs with desired data fields (always includes ['ID','hostHaloID','numSubStruct','Mass_tot','Mass_200crit','M_gas','Xc','Yc','Zc','R_200crit'])
 
     ##### inputs
@@ -166,10 +166,9 @@ def read_vr_treefrog_data(vr_directory,vr_prefix,tf_directory,tf_name,files_type
     if verbose==1:
         print('Assembling descendent tree using VR python tools')
 
-    tf_treefile=tf_directory+tf_name
-    print(tf_treefile)
-    halo_tree=ReadHaloMergerTree(tf_treefile,ibinary=files_type,iverbose=1,imerit=True,inpart=False)
-    BuildTemporalHeadTail(snap_no,halo_tree,halo_data_counts,halo_data_all,iverbose=0,TEMPORALHALOIDVAL=halo_TEMPORALHALOIDVAL)
+    tf_treefile=tf_name
+    halo_tree=ReadHaloMergerTreeDescendant(tf_treefile,ibinary=files_type,iverbose=1,imerit=True,inpart=False)
+    BuildTemporalHeadTailDescendant(snap_no,halo_tree,halo_data_counts,halo_data_all,iverbose=0,TEMPORALHALOIDVAL=halo_TEMPORALHALOIDVAL)
 
     if verbose==1:
         print('Finished assembling descendent tree using VR python tools')
