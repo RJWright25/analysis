@@ -170,15 +170,14 @@ def read_vr_treefrog_data(vr_directory,vr_prefix,tf_name,files_type=2,files_nest
     halo_tree=ReadHaloMergerTreeDescendant(tf_treefile,ibinary=files_type,iverbose=1,imerit=True,inpart=False)
     BuildTemporalHeadTailDescendant(snap_no,halo_tree,halo_data_counts,halo_data_all,iverbose=0)
     
-    return halo_data_all
-
-def add_particle_lists(vr_directory,vr_prefix,halo_data_all,files_type=2,files_nested=False,files_lz=4,part_data_from_snap=120,halo_TEMPORALHALOIDVAL=1000000,verbose=1):
-    snap_no=len(halo_data_all)
-    #save the no_pl data
-
     if verbose==1:
         print('Finished assembling descendent tree using VR python tools')
     
+    return halo_data_all
+
+def add_particle_lists(vr_directory,vr_prefix,halo_data_all,files_type=2,files_nested=False,files_lz=4,part_data_from_snap=120,verbose=1):
+    snap_no=len(halo_data_all)
+    #save the no_pl data
     if verbose==1:
         print('Adding particle lists to halos using VR python tools')
     
@@ -200,6 +199,7 @@ def add_particle_lists(vr_directory,vr_prefix,halo_data_all,files_type=2,files_n
             for part_key in list(part_data_temp.keys()):
                 halo_data_all[snap][part_key]=part_data_temp[part_key] 
 
+
     if verbose==1:
         print('Finished adding particle lists to halos using VR python tools')
 
@@ -207,6 +207,8 @@ def add_particle_lists(vr_directory,vr_prefix,halo_data_all,files_type=2,files_n
         print('Appending FOF particle lists with substructure')
 
     for snap in sim_snaps:#iterate through snaps to add substructure particle lists to FOF halo particle
+        if verbose==1:
+
 
         halo_data_temp=halo_data_all[snap]
         field_halo_indices_temp=np.where(halo_data_temp['hostHaloID']==-1)[0]#find field/fof halos
