@@ -169,8 +169,9 @@ def read_vr_treefrog_data(vr_directory,vr_prefix,tf_directory,tf_name,files_type
         print('Assembling descendent tree using VR python tools')
 
     tf_treefile=tf_directory+tf_name
-    halo_tree=ReadHaloMergerTreeDescendant(tf_treefile,ibinary=files_type,iverbose=0,imerit=True,inpart=False)
-    BuildTemporalHeadTailDescendant(snap_no,halo_tree,halo_data_counts,halo_data_all,iverbose=0,TEMPORALHALOIDVAL=halo_TEMPORALHALOIDVAL)
+    print(tf_treefile)
+    halo_tree=ReadHaloMergerTree(tf_treefile,ibinary=files_type,iverbose=1,imerit=True,inpart=False)
+    BuildTemporalHeadTail(snap_no,halo_tree,halo_data_counts,halo_data_all,iverbose=0,TEMPORALHALOIDVAL=halo_TEMPORALHALOIDVAL)
 
     if verbose==1:
         print('Finished assembling descendent tree using VR python tools')
