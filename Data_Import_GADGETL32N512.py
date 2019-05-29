@@ -25,8 +25,9 @@ sim_snaps=[i for i in range(sim_no_snaps)] #will track halos from last snap here
 sim_volume=32**3 #Mpc^3
 sim_z0_snap=sim_snaps[-1]
 
-sim_mdm=particle_file_temp['Header']['MassTable'][1]
-sim_mgas=particle_file_temp['Header']['MassTable'][0]
+
+sim_mdm=particle_file_temp['Header'].attrs('MassTable')[1]
+sim_mdm=particle_file_temp['Header'].attrs('MassTable')[0]
 sim_fb=sim_mgas/(sim_mdm+sim_mgas)
 
 # Import BASE halo data + particle lists
