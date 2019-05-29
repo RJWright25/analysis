@@ -27,7 +27,7 @@ sim_z0_snap=sim_snaps[-1]
 
 
 sim_mdm=particle_file_temp['Header'].attrs['MassTable'][1]
-sim_mdm=particle_file_temp['Header'].attrs['MassTable'][0]
+sim_mgas=particle_file_temp['Header'].attrs['MassTable'][0]
 sim_fb=sim_mgas/(sim_mdm+sim_mgas)
 
 # Import BASE halo data + particle lists
