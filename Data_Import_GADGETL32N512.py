@@ -69,7 +69,7 @@ sim_timesteps=read_sim_timesteps(run_directory=run_directory,sim_type='GADGET',s
 
 # Import BASE halo data
 
-if True:#if we want base halo data
+if False:#if we want base halo data
     halo_data_base=read_vr_treefrog_data(vr_directory=vr_directory,vr_prefix="snapshot_",tf_name=tf_treefile,snap_no=sim_no_snaps,files_lz=3,files_type=2,files_nested=True,extra_halo_fields=['npart'],verbose=1)
     #once read, save this. 
     with open('halo_data_base.txt', 'wb') as halo_data_file:

@@ -181,8 +181,10 @@ def add_particle_lists(vr_directory,vr_prefix,halo_data_all,files_type=2,files_n
     if verbose==1:
         print('Adding particle lists to halos using VR python tools')
     
-    for snap in sim_snaps: #iterate through snaps to add particle data to halo_data_all structure
-        print('Adding particle lists to halos for snap = ',snap)
+    for snap in range(snap_no): #iterate through snaps to add particle data to halo_data_all structure
+        if verbose==True:
+            print('Adding particle lists to halos for snap = ',snap)
+            
         n_halos=len(halo_data_all[snap]['ID'])
 
         if snap>part_data_from_snap:#if there are a good amount of halos and snap late enough
