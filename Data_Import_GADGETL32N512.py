@@ -1,4 +1,6 @@
 ### RW_Init: basic presets
+import sys
+sys.path.append('/mnt/su3ctm/rwright/RW_PythonTools/')
 
 import matplotlib
 import matplotlib.pyplot as plt
