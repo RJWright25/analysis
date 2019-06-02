@@ -210,32 +210,34 @@ def add_particle_lists(vr_directory,vr_prefix,halo_data_all,files_type=2,files_n
         print('Appending FOF particle lists with substructure')
 
     for snap in range(snap_no):#iterate through snaps to add substructure particle lists to FOF halo particle
+
+        if snap>part_data_from_snap:
+
+            if verbose==1:
+                print('Adding substructure particles to FOF halos for snap = ',snap)
+
+            halo_data_temp=halo_data_all[snap]
+            field_halo_indices_temp=np.where(halo_data_temp['hostHaloID']==-1)[0]#find field/fof halos
+
+            if len(field_halo_indices_temp)>0:#where there are field halos
+                for field_halo_ID in halo_data_temp['ID'][field_halo_indices_temp]:#go through each field halo
+
+                    sub_halos_temp=(np.where(halo_data_temp['hostHaloID']==field_halo_ID)[0])#find its subhalos
+
+                    if len(sub_halos_temp)>0:#where there is substructure
+
+                        field_halo_temp_index=np.where(halo_data_temp['ID']==field_halo_ID)[0][0]
+                        field_halo_plist=halo_data_temp['Particle_IDs'][field_halo_temp_index]
+                        field_halo_tlist=halo_data_temp['Particle_Types'][field_halo_temp_index]
+                        sub_halos_plist=np.concatenate([halo_data_temp['Particle_IDs'][isub] for isub in sub_halos_temp])#list all particles IDs in substructure
+                        sub_halos_tlist=np.concatenate([halo_data_temp['Particle_Types'][isub] for isub in sub_halos_temp])#list all particles types substructure
+
+                        halo_data_temp['Particle_IDs'][field_halo_temp_index]=np.concatenate([field_halo_plist,sub_halos_plist])#add particles to field halo particle list
+                        halo_data_temp['Particle_Types'][field_halo_temp_index]=np.concatenate([field_halo_tlist,sub_halos_tlist])#add particles to field halo particle list
+                        halo_data_temp['Npart'][field_halo_temp_index]=len(halo_data_temp['Particle_IDs'][field_halo_temp_index])#update Npart for each field halo
+
         if verbose==1:
-            print('Adding substructure particles to FOF halos for snap = ',snap)
-
-        halo_data_temp=halo_data_all[snap]
-        field_halo_indices_temp=np.where(halo_data_temp['hostHaloID']==-1)[0]#find field/fof halos
-
-        if len(field_halo_indices_temp)>0:#where there are field halos
-            for field_halo_ID in halo_data_temp['ID'][field_halo_indices_temp]:#go through each field halo
-
-                sub_halos_temp=(np.where(halo_data_temp['hostHaloID']==field_halo_ID)[0])#find its subhalos
-
-                if len(sub_halos_temp)>0:#where there is substructure
-
-                    field_halo_temp_index=np.where(halo_data_temp['ID']==field_halo_ID)[0][0]
-
-                    field_halo_plist=halo_data_temp['Particle_IDs'][field_halo_temp_index]
-                    field_halo_tlist=halo_data_temp['Particle_Types'][field_halo_temp_index]
-                    sub_halos_plist=np.concatenate([halo_data_temp['Particle_IDs'][isub] for isub in sub_halos_temp])#list all particles IDs in substructure
-                    sub_halos_tlist=np.concatenate([halo_data_temp['Particle_Types'][isub] for isub in sub_halos_temp])#list all particles types substructure
-
-                    halo_data_temp['Particle_IDs'][field_halo_temp_index]=np.concatenate([field_halo_plist,sub_halos_plist])#add particles to field halo particle list
-                    halo_data_temp['Particle_Types'][field_halo_temp_index]=np.concatenate([field_halo_tlist,sub_halos_tlist])#add particles to field halo particle list
-                    halo_data_temp['Npart'][field_halo_temp_index]=len(halo_data_temp['Particle_IDs'][field_halo_temp_index])#update Npart for each field halo
-
-    if verbose==1:
-        print('Finished appending FOF particle lists with substructure')
+            print('Finished appending FOF particle lists with substructure')
 
     return halo_data_all
 
