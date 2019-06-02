@@ -177,6 +177,7 @@ def read_vr_treefrog_data(vr_directory,vr_prefix,tf_name,files_type=2,files_nest
 
 def add_particle_lists(vr_directory,vr_prefix,halo_data_all,files_type=2,files_nested=False,files_lz=4,part_data_from_snap=120,verbose=1):
     snap_no=len(halo_data_all)
+    
     #save the no_pl data
     if verbose==1:
         print('Adding particle lists to halos using VR python tools')
@@ -208,7 +209,7 @@ def add_particle_lists(vr_directory,vr_prefix,halo_data_all,files_type=2,files_n
     if verbose==1:
         print('Appending FOF particle lists with substructure')
 
-    for snap in sim_snaps:#iterate through snaps to add substructure particle lists to FOF halo particle
+    for snap in range(snap_no):#iterate through snaps to add substructure particle lists to FOF halo particle
         if verbose==1:
             print('Adding substructure particles to FOF halos for snap = ',snap)
 
