@@ -183,12 +183,13 @@ def add_particle_lists(vr_directory,vr_prefix,halo_data_all,files_type=2,files_n
         print('Adding particle lists to halos using VR python tools')
     
     for snap in range(snap_no): #iterate through snaps to add particle data to halo_data_all structure
-        if verbose==True:
-            print('Adding particle lists to halos for snap = ',snap)
-            
-        n_halos=len(halo_data_all[snap]['ID'])
 
         if snap>part_data_from_snap:#if there are a good amount of halos and snap late enough
+            if verbose==True:
+                print('Adding particle lists to halos for snap = ',snap)
+
+            n_halos=len(halo_data_all[snap]['ID'])
+
             if files_nested==False:
                 part_data_temp=ReadParticleDataFile(vr_directory+vr_prefix+str(snap).zfill(files_lz),ibinary=files_type,iverbose=0,iparttypes=1)
             else:
@@ -212,7 +213,6 @@ def add_particle_lists(vr_directory,vr_prefix,halo_data_all,files_type=2,files_n
     for snap in range(snap_no):#iterate through snaps to add substructure particle lists to FOF halo particle
 
         if snap>part_data_from_snap:
-
             if verbose==1:
                 print('Adding substructure particles to FOF halos for snap = ',snap)
 
@@ -236,8 +236,8 @@ def add_particle_lists(vr_directory,vr_prefix,halo_data_all,files_type=2,files_n
                         halo_data_temp['Particle_Types'][field_halo_temp_index]=np.concatenate([field_halo_tlist,sub_halos_tlist])#add particles to field halo particle list
                         halo_data_temp['Npart'][field_halo_temp_index]=len(halo_data_temp['Particle_IDs'][field_halo_temp_index])#update Npart for each field halo
 
-        if verbose==1:
-            print('Finished appending FOF particle lists with substructure')
+    if verbose==1:
+        print('Finished appending FOF particle lists with substructure')
 
     return halo_data_all
 
