@@ -280,7 +280,6 @@ def gen_delta_npart(halo_data,snaps,unique_particle_list,mass_table,vr_directory
 
         for ihalo in range(n_halo_2):
             progen_index=find_progen_index(index_0=ihalo,snap=snap,depth=depth)
-            print(progen_index)
             if progen_index>-1:
                 part_IDs_1[ihalo]=part_data_1["Particle_IDs"][progen_index]
                 part_Types_1[ihalo]=part_data_1["Particle_Types"][progen_index]
@@ -364,7 +363,7 @@ def gen_delta_npart(halo_data,snaps,unique_particle_list,mass_table,vr_directory
             acc_dm[isnap]=np.array(delta_m0)/delta_t
             acc_gas[isnap]=np.array(delta_m1)/delta_t
         else:
-            acc_dm[isnap]=np.array(celta_m1)/delta_t
+            acc_dm[isnap]=np.array(delta_m1)/delta_t
             acc_gas[isnap]=np.array(delta_m0)/delta_t
 
     return acc_dm,acc_gas
