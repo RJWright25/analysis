@@ -133,7 +133,7 @@ def read_vr_treefrog_data(vr_directory,vr_prefix,tf_treefile,vr_files_type=2,vr_
         for snap in sim_snaps:
             scale_factor=halo_data_all[snap]['SimulationInfo']['ScaleFactor']
             print(scale_factor)
-            redshift=z_at_value(cosmo.scale_factor,scale_factor,zmin=-1)
+            redshift=z_at_value(cosmo.scale_factor,scale_factor,zmin=-0.5)
             print(redshift)
             lookback_time=cosmo.lookback_time(redshift)
             print(lookback_time)
