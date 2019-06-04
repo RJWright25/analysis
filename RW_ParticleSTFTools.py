@@ -96,7 +96,6 @@ def read_vr_treefrog_data(vr_directory,vr_prefix,tf_treefile,vr_files_type=2,vr_
         print('Reading halo data using VR python tools')
 
     # Load data from all desired snaps into list structure
-    print(vr_directory+vr_prefix+str(199).zfill(vr_files_lz))
     if vr_files_nested==False:
         halo_data_all=[ReadPropertyFile(vr_directory+vr_prefix+str(snap).zfill(vr_files_lz),ibinary=vr_files_type,iseparatesubfiles=0,iverbose=0, desiredfields=halo_fields, isiminfo=True, iunitinfo=True) for snap in sim_snaps]
     else:
@@ -112,9 +111,6 @@ def read_vr_treefrog_data(vr_directory,vr_prefix,tf_treefile,vr_files_type=2,vr_
     # List sim info and unit info for each snap (in dictionaries)
     halo_siminfo=[halo_data_all[snap]['SimulationInfo'] for snap in sim_snaps]
     halo_unitinfo=[halo_data_all[snap]['UnitInfo'] for snap in sim_snaps]
-
-    print(halo_siminfo)
-    print(halo_unitinfo)
     
     # import tree data from TreeFrog, build temporal head/tails from descendants -- adds to halo_data_all (all halo data)
     if verbose==1:
