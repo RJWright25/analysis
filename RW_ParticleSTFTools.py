@@ -7,7 +7,8 @@ if True:
     import matplotlib.pyplot as plt
     import numpy as np
     import h5py
-    from astropy.cosmology import FlatLambdaCDM
+    import astropy.units as u
+    from astropy.cosmology import FlatLambdaCDM,z_at_value
 
     # VELOCIraptor python tools 
     from RW_VRTools import *
@@ -66,7 +67,7 @@ def read_sim_timesteps(run_directory,sim_type='SWIFT',snap_no=200,files_lz=4):
                 sim_timesteps[fields_out[ifield]][snap]=particle_file_temp['Header'].attrs[field]
             particle_file_temp.close()
 
-        sim_timesteps['Lookback_time']=cosmo.lookback_time(sim_timesteps['Redshift']).astype(float)
+        sim_timesteps['Lookback_time']=FlatLambdaCDM.lookback_time(sim_timesteps['Redshift']).astype(float)
 
 
     return sim_timesteps
@@ -124,6 +125,18 @@ def read_vr_treefrog_data(vr_directory,vr_prefix,tf_treefile,vr_files_type=2,vr_
     
     if verbose==1:
         print('Finished assembling descendent tree using VR python tools')
+
+    if verbose==1:
+        H0=halo_data_all[0]['SimulationInfo']['h_val']*halo_data_all[0]['SimulationInfo']['Hubble_unit']
+        Om0=halo_data_all[0]['SimulationInfo']['Omega_Lambda']
+        cosmo=FlatLambdaCDM(H0=H0,Om0=Om0)
+        print('Adding timestep info')
+        scale_factors=[halo_data_all[snap]['SimulationInfo']['ScaleFactor'] for snap in sim_snaps]
+        print(scale_factors)
+        redshifts=z_at_value(cosmo.scale_factor,scale_factors)
+        print(redshifts)
+        lookback_times=cosmo.lookback_time(redshifts)
+        print(lookback_times)
 
     return halo_data_all
 
