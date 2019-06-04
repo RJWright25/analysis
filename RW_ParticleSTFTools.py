@@ -169,7 +169,7 @@ def gen_part_history(halo_data,vr_directory,vr_prefix,vr_files_type=2,vr_files_n
 
     for snap in range(len(halo_data)):
 
-        particle_data_temp=read_particle_lists(snap=snap,halo_data_snap=halo_data[snap],vr_directory=vr_directory,vr_prefix=vr_prefix,vr_files_type=vr_files_type,vr_files_nested=vr_files_nested)
+        particle_data_temp=gen_particle_lists(snap=snap,halo_data_snap=halo_data[snap],vr_directory=vr_directory,vr_prefix=vr_prefix,vr_files_type=vr_files_type,vr_files_nested=vr_files_nested)
 
         if len(particle_data_temp['Particle_IDs'])==0:#if no halos or no particle data
             field_part_ids[snap]=[]
