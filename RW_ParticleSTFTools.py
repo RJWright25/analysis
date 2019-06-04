@@ -12,65 +12,6 @@ if True:
 
     # VELOCIraptor python tools 
     from RW_VRTools import *
-    
-##########################################################################################################################################################################
-########################################################################### READ PARTICLE DATA ###########################################################################
-##########################################################################################################################################################################
-
-def read_sim_timesteps(run_directory,sim_type='SWIFT',snap_no=200,files_lz=4):
-    ##### inputs
-    # run directory: STRING for directory of run
-
-    ##### returns
-    # dictionary: lookback time, expansion factor, redshift for each snap (starting at snap = 0)
-
-    if sim_type=='SWIFT':
-        fields=['Lookback time [internal units]','Redshift','Scale-factor']
-        prefix="snap_"
-
-        snaps=[i for i in range(snap_no)]
-        particle_data_file_directories=[run_directory+prefix+str(snap).zfill(files_lz)+".hdf5" for snap in snaps]
-
-        sim_timesteps={'Lookback_time':[],'Redshift':[],'Scale_factor':[]}
-        fields_out=list(sim_timesteps.keys())
-
-        for snap in snaps:
-            particle_file_temp=h5py.File(particle_data_file_directories[snap])            
-            time_unit_cgs=particle_file_temp['Units'].attrs['Unit time in cgs (U_t)']
-            for ifield,field in enumerate(fields):
-                if ifield==0:
-                    sim_timesteps[fields_out[ifield]].extend(particle_file_temp['Cosmology'].attrs[field]*time_unit_cgs/(365.25*24*3600*10**9))
-                else:
-                    sim_timesteps[fields_out[ifield]].extend(particle_file_temp['Cosmology'].attrs[field])
-            particle_file_temp.close()
-
-
-    if sim_type=='GADGET':
-        fields=['Redshift','Time']
-        prefix="snapshot_"
-        particle_file_temp=run_directory+prefix+str(0).zfill(files_lz)+".hdf5"
-        particle_file_temp=h5py.File(particle_file_temp)
-
-        H0=particle_file_temp['Header'].attrs['HubbleParam']*100
-        Om0=particle_file_temp['Header'].attrs['Omega0']     
-        cosmo=FlatLambdaCDM(H0=H0,Om0=Om0)
-
-        snaps=[i for i in range(snap_no)]
-        particle_data_file_directories=[run_directory+prefix+str(snap).zfill(files_lz)+".hdf5" for snap in snaps]
-
-        sim_timesteps={'Redshift':np.zeros(snap_no),'Scale_factor':np.zeros(snap_no)}
-        fields_out=list(sim_timesteps.keys())
-        
-        for snap in snaps:
-            particle_file_temp=h5py.File(particle_data_file_directories[snap])
-            for ifield,field in enumerate(fields):
-                sim_timesteps[fields_out[ifield]][snap]=particle_file_temp['Header'].attrs[field]
-            particle_file_temp.close()
-
-        sim_timesteps['Lookback_time']=FlatLambdaCDM.lookback_time(sim_timesteps['Redshift']).astype(float)
-
-
-    return sim_timesteps
 
 ##########################################################################################################################################################################
 ############################################################################## CREATE HALO DATA ##########################################################################
@@ -126,17 +67,23 @@ def read_vr_treefrog_data(vr_directory,vr_prefix,tf_treefile,vr_files_type=2,vr_
     if verbose==1:
         print('Finished assembling descendent tree using VR python tools')
 
+
+
     if verbose==1:
-        H0=halo_data_all[0]['SimulationInfo']['h_val']*halo_data_all[0]['SimulationInfo']['Hubble_unit']
-        Om0=halo_data_all[0]['SimulationInfo']['Omega_Lambda']
-        cosmo=FlatLambdaCDM(H0=H0,Om0=Om0)
-        for snap in sim_snaps:
-            scale_factor=halo_data_all[snap]['SimulationInfo']['ScaleFactor']
-            print(scale_factor)
-            redshift=z_at_value(cosmo.scale_factor,scale_factor,zmin=-0.5)
-            print(redshift)
-            lookback_time=cosmo.lookback_time(redshift).value
-            print(lookback_time)
+        print('Adding timestep information & finishing up')
+
+    H0=halo_data_all[0]['SimulationInfo']['h_val']*halo_data_all[0]['SimulationInfo']['Hubble_unit']
+    Om0=halo_data_all[0]['SimulationInfo']['Omega_Lambda']
+    cosmo=FlatLambdaCDM(H0=H0,Om0=Om0)
+
+    for snap in sim_snaps:
+        scale_factor=halo_data_all[snap]['SimulationInfo']['ScaleFactor']
+        redshift=z_at_value(cosmo.scale_factor,scale_factor,zmin=-0.5)
+        lookback_time=cosmo.lookback_time(redshift).value
+
+        halo_data_all[snap]['SimulationInfo']['z']=redshift
+        halo_data_all[snap]['SimulationInfo']['LookbackTime']=lookback_time
+
 
     return halo_data_all
 
