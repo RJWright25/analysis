@@ -17,7 +17,7 @@ if True:
 def read_mass_table(run_directory,sim_type='SWIFT',snap_prefix="snap_",snap_lz=4):
 
     #return mass of PartType0, PartType1 particles in sim units
-
+    print(run_directory+snap_prefix+str(0).zfill(snap_lz))
     temp_file=h5py.File(run_directory+snap_prefix+str(0).zfill(snap_lz))
 
     if sim_type=='SWIFT':
@@ -222,8 +222,8 @@ def gen_delta_npart(halo_data,unique_particle_list,sim_timesteps,depth=5,trim_ho
 
     ##### returns
     # halo_data with delta_m0 and delta_m1 keys
-    # 
-    #  
+
+
     snaps=[]
     for snap in range(len(halo_data)):
         if not halo_data[snap]['Particle_IDs']==[]:
