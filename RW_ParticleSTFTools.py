@@ -144,7 +144,7 @@ def gen_particle_lists(snap,halo_data_snap,vr_directory,vr_prefix,vr_files_type=
 
                 part_data_temp['Particle_IDs'][field_halo_temp_index]=np.concatenate([field_halo_plist,sub_halos_plist])#add particles to field halo particle list
                 part_data_temp['Particle_Types'][field_halo_temp_index]=np.concatenate([field_halo_tlist,sub_halos_tlist])#add particles to field halo particle list
-                part_data_temp['Npart'][field_halo_temp_index]=len(halo_data_snap['Particle_IDs'][field_halo_temp_index])#update Npart for each field halo
+                part_data_temp['Npart'][field_halo_temp_index]=len(part_data_temp['Particle_IDs'][field_halo_temp_index])#update Npart for each field halo
 
     if verbose==1:
         print('Finished with particle lists for snap = ',snap)
