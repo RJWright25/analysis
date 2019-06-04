@@ -248,7 +248,7 @@ def gen_delta_npart(halo_data,snaps,unique_particle_list,mass_table,vr_directory
 
         if verbose==True:
             print('Generating accretion rates for snap = ',snap)
-            print(isnap/len(snaps)*100,' \% done with snaps')
+            print(isnap/len(snaps)*100,' % done with snaps')
 
         #find final snap particle data
         part_data_2=gen_particle_lists(snap,halo_data_snap=halo_data[snap],vr_directory=vr_directory,vr_prefix=vr_prefix,vr_files_type=2,vr_files_nested=False,vr_files_lz=4,verbose=1)
@@ -274,17 +274,16 @@ def gen_delta_npart(halo_data,snaps,unique_particle_list,mass_table,vr_directory
                 part_Types_2[ihalo]=[]
             continue#go to next snap
 
-        part_IDs_1=part_data_1["Particle_IDs"]
-        part_Types_1=part_data_1["Particle_Types"]
-
         #if we have found both initial and final snapshot lists...
+        part_IDs_1=[[] for i in range(n_halo_2)]
+        part_Types_1=[[] for i in range(n_halo_2)]
         
         for ihalo in range(n_halo_2):
             progen_index=find_progen_index(index_0=ihalo,snap=snap,depth=depth)
             print(progen_index)
             if progen_index>-1:
-                part_IDs_1[ihalo]=part_IDs_1[progen_index]
-                part_Types_1[ihalo]=part_Types_1[progen_index]
+                part_IDs_1[ihalo]=part_data_1["Particle_IDs"][progen_index]
+                part_Types_1[ihalo]=part_data_1["Particle_Types"][progen_index]
                 halo_tracked[ihalo]=True
             else:
                 part_IDs_1[ihalo]=[]
