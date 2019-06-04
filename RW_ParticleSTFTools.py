@@ -259,14 +259,15 @@ def gen_part_history(halo_data,verbose=True):
 
     for snap in range(len(halo_data)):
 
-        if verbose==True:
-            print('Generating particle histories for snap = ',snap)
-
         if len(halo_data[snap]['Particle_IDs'])==0:#if no halos
             field_part_ids[snap]=[]
             sub_part_ids[snap]=[]
 
+
         else:
+            if verbose==True:
+                print('Generating particle histories for snap = ',snap)
+
             field_halo_indices=np.where(halo_data[snap]['hostHaloID']==-1)[0]
             sub_halo_indices=np.where(halo_data[snap]['hostHaloID']>0)[0]
 
@@ -301,7 +302,7 @@ def gen_part_history(halo_data,verbose=True):
 ############################################################################## CALC DELTA_N ##############################################################################
 ##########################################################################################################################################################################
 
-def gen_delta_npart(halo_data,sim_timesteps,type_order,mass_table,unique_particle_list=[],snaps=list(range(120,200,199)),depth=5,trim_hoes=True,verbose=True): 
+def gen_delta_npart(halo_data,sim_timesteps,type_order,mass_table,unique_particle_list=[],depth=5,trim_hoes=True,verbose=True): 
 
     ##### inputs
     # halo_data (from above - needs particle lists)
@@ -310,6 +311,10 @@ def gen_delta_npart(halo_data,sim_timesteps,type_order,mass_table,unique_particl
 
     ##### returns
     # halo_data with delta_m0 and delta_m1 keys 
+    snaps=[]
+    for snap in range(len(halo_data)):
+        if not halo_data[snap]['Particle_IDs']==[]:
+            snaps.append(snap)
 
     def find_progen_index(index_0,snap,depth):
         id_0=halo_data[snap]['ID'][index_0]#the original id
@@ -324,7 +329,8 @@ def gen_delta_npart(halo_data,sim_timesteps,type_order,mass_table,unique_particl
                 return new_index
              #new index at snap-depth
         return new_index
-    # if we done have particle lists, generate them now
+
+    # if we don't have particle lists, generate them now
     if unique_particle_list==[]:
         if verbose==True:
             print('Generating unique particle histories')
