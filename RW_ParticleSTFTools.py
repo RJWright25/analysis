@@ -17,8 +17,7 @@ if True:
 def read_mass_table(run_directory,sim_type='SWIFT',snap_prefix="snap_",snap_lz=4):
 
     #return mass of PartType0, PartType1 particles in sim units
-    print(run_directory+snap_prefix+str(0).zfill(snap_lz))
-    temp_file=h5py.File(run_directory+snap_prefix+str(0).zfill(snap_lz))
+    temp_file=h5py.File(run_directory+snap_prefix+str(0).zfill(snap_lz)+".hdf5")
 
     if sim_type=='SWIFT':
         M0=temp_file['PartType0']['Masses'][0]
