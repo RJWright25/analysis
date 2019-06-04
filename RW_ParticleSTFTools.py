@@ -273,8 +273,10 @@ def gen_delta_npart(halo_data,snaps,unique_particle_list,mass_table,vr_directory
                 part_IDs_2[ihalo]=[]
                 part_Types_2[ihalo]=[]
             continue#go to next snap
+        part_IDs_1=part_data_1["Particle_IDs"]
+        part_Types_1=part_data_1["Particle_Types"]
 
-        #if we have found both initial and final particle lists...
+        #if we have found both initial and final snapshot lists...
         for ihalo in range(n_halo_2):
             progen_index=find_progen_index(index_0=ihalo,snap=snap,depth=depth)
             if progen_index>-1:
