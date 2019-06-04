@@ -130,13 +130,13 @@ def read_vr_treefrog_data(vr_directory,vr_prefix,tf_treefile,vr_files_type=2,vr_
         H0=halo_data_all[0]['SimulationInfo']['h_val']*halo_data_all[0]['SimulationInfo']['Hubble_unit']
         Om0=halo_data_all[0]['SimulationInfo']['Omega_Lambda']
         cosmo=FlatLambdaCDM(H0=H0,Om0=Om0)
-        print('Adding timestep info')
-        scale_factors=np.array([halo_data_all[snap]['SimulationInfo']['ScaleFactor'] for snap in sim_snaps])
-        print(scale_factors)
-        redshifts=np.array([z_at_value(cosmo.scale_factor,scale_factors[snap],zmin=0,ztol=1e-16) for snap in sim_snaps])
-        print(redshifts)
-        lookback_times=cosmo.lookback_time(redshifts)
-        print(lookback_times)
+        for snap in sim_snaps:
+            scale_factor=[halo_data_all[snap]['SimulationInfo']['ScaleFactor']
+            print(scale_factor)
+            redshift=z_at_value(cosmo.scale_factor,scale_factor,zmin=-1)
+            print(redshift)
+            lookback_time=cosmo.lookback_time(redshift)
+            print(lookback_time)
 
     return halo_data_all
 
