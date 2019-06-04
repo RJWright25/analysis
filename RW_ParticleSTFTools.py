@@ -130,7 +130,7 @@ def gen_particle_lists(snap,halo_data_snap,vr_directory,vr_prefix,vr_files_type=
 
     field_halo_indices_temp=np.where(halo_data_snap['hostHaloID']==-1)[0]#find field/fof halos
     if len(field_halo_indices_temp)>0:#where there are field halos
-        for field_halo_ID in halo_data_temp['ID'][field_halo_indices_temp]:#go through each field halo
+        for field_halo_ID in halo_data_snap['ID'][field_halo_indices_temp]:#go through each field halo
 
             sub_halos_temp=(np.where(halo_data_snap['hostHaloID']==field_halo_ID)[0])#find its subhalos
 
@@ -144,7 +144,7 @@ def gen_particle_lists(snap,halo_data_snap,vr_directory,vr_prefix,vr_files_type=
 
                 part_data_temp['Particle_IDs'][field_halo_temp_index]=np.concatenate([field_halo_plist,sub_halos_plist])#add particles to field halo particle list
                 part_data_temp['Particle_Types'][field_halo_temp_index]=np.concatenate([field_halo_tlist,sub_halos_tlist])#add particles to field halo particle list
-                part_data_temp['Npart'][field_halo_temp_index]=len(halo_data_temp['Particle_IDs'][field_halo_temp_index])#update Npart for each field halo
+                part_data_temp['Npart'][field_halo_temp_index]=len(halo_data_snap['Particle_IDs'][field_halo_temp_index])#update Npart for each field halo
 
     if verbose==1:
         print('Finished with particle lists for snap = ',snap)
