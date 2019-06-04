@@ -13,6 +13,24 @@ if True:
     # VELOCIraptor python tools 
     from RW_VRTools import *
 
+
+def read_mass_table(run_directory,sim_type='SWIFT',snap_prefix="snap_",snap_lz=4):
+
+    #return mass of PartType0, PartType1 particles in sim units
+
+    temp_file=h5py.File(run_directory+snap_prefix+str(0).zfill(snap_lz))
+
+    if sim_type=='SWIFT':
+        M0=temp_file['PartType0']['Masses'][0]
+        M1=temp_file['PartType1']['Masses'][0]
+        return np.array([M0,M1])
+
+    if sim_type=='GADGET':
+        M0=temp_file['Header']['MassTable'][0]
+        M1=temp_file['Header']['MassTable'][1]
+        return np.array([M0,M1])
+
+
 ##########################################################################################################################################################################
 ############################################################################## CREATE HALO DATA ##########################################################################
 ##########################################################################################################################################################################
@@ -203,7 +221,9 @@ def gen_delta_npart(halo_data,unique_particle_list,sim_timesteps,depth=5,trim_ho
     # trim_hoes: get rid of particles which have been part of structure before when calculating accretion rate?
 
     ##### returns
-    # halo_data with delta_m0 and delta_m1 keys 
+    # halo_data with delta_m0 and delta_m1 keys
+    # 
+    #  
     snaps=[]
     for snap in range(len(halo_data)):
         if not halo_data[snap]['Particle_IDs']==[]:
@@ -222,12 +242,6 @@ def gen_delta_npart(halo_data,unique_particle_list,sim_timesteps,depth=5,trim_ho
                 return new_index
              #new index at snap-depth
         return new_index
-
-    # if we don't have particle lists, generate them now
-    if unique_particle_list==[]:
-        if verbose==True:
-            print('Generating unique particle histories')
-        unique_particle_list=gen_part_history(halo_data)
 
     # iterate through each snap
     for snap in snaps:
