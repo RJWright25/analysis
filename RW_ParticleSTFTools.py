@@ -7,7 +7,6 @@ if True:
     import matplotlib.pyplot as plt
     import numpy as np
     import h5py
-    from scipy import constants.physical_constants as const
     from astropy.cosmology import FlatLambdaCDM
 
     # VELOCIraptor python tools 
