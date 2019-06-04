@@ -131,7 +131,7 @@ def read_vr_treefrog_data(vr_directory,vr_prefix,tf_treefile,vr_files_type=2,vr_
         Om0=halo_data_all[0]['SimulationInfo']['Omega_Lambda']
         cosmo=FlatLambdaCDM(H0=H0,Om0=Om0)
         for snap in sim_snaps:
-            scale_factor=[halo_data_all[snap]['SimulationInfo']['ScaleFactor']
+            scale_factor=halo_data_all[snap]['SimulationInfo']['ScaleFactor']
             print(scale_factor)
             redshift=z_at_value(cosmo.scale_factor,scale_factor,zmin=-1)
             print(redshift)
