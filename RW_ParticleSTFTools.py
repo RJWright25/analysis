@@ -136,7 +136,7 @@ def read_vr_treefrog_data(vr_directory,vr_prefix,tf_treefile,vr_files_type=2,vr_
             redshift=z_at_value(cosmo.scale_factor,scale_factor,zmin=-0.5)
             print(redshift)
             lookback_time=cosmo.lookback_time(redshift)
-            print(lookback_time)
+            print(list(lookback_time.attrs))
 
     return halo_data_all
 
