@@ -277,7 +277,7 @@ def gen_delta_npart(halo_data,snaps,unique_particle_list,mass_table,vr_directory
         #if we have found both initial and final snapshot lists...
         part_IDs_1=[[] for i in range(n_halo_2)]
         part_Types_1=[[] for i in range(n_halo_2)]
-        
+
         for ihalo in range(n_halo_2):
             progen_index=find_progen_index(index_0=ihalo,snap=snap,depth=depth)
             print(progen_index)
@@ -306,7 +306,7 @@ def gen_delta_npart(halo_data,snaps,unique_particle_list,mass_table,vr_directory
                 continue
 
 
-
+        field_halo=[np.nan for i in range(n_halo_2)]
         for ihalo in range(n_halo_2):#for each halo, find accretion rate
 
             field_halo[ihalo]=halo_data[snap]['hostHaloID'][ihalo]==-1#True if dealing with field, False if dealing with Sub
