@@ -11,15 +11,8 @@ if True:
     from astropy.cosmology import FlatLambdaCDM
 
     # VELOCIraptor python tools 
-    from RW_VRTools import ReadPropertyFile
-    from RW_VRTools import TraceMainProgen
-    from RW_VRTools import ReadHaloMergerTree
-    from RW_VRTools import ReadHaloMergerTreeDescendant
-    from RW_VRTools import BuildTemporalHeadTail
-    from RW_VRTools import BuildTemporalHeadTailDescendant
-    from RW_VRTools import ReadParticleDataFile
-    from RW_VRTools import ReadSOParticleDataFile
-
+    from RW_VRTools import *
+    
 ##########################################################################################################################################################################
 ########################################################################### READ PARTICLE DATA ###########################################################################
 ##########################################################################################################################################################################
