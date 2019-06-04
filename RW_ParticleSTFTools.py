@@ -212,7 +212,7 @@ def gen_part_history(halo_data,vr_directory,vr_prefix,vr_files_type=2,vr_files_n
 ############################################################################## CALC DELTA_N ##############################################################################
 ##########################################################################################################################################################################
 
-def gen_delta_npart(halo_data,unique_particle_list,sim_timesteps,depth=5,trim_hoes=True,verbose=True): 
+def gen_delta_npart(halo_data,unique_particle_list,mass_table,snaps=list(range(180,200,1)),depth=5,trim_hoes=True,verbose=True): 
 
     ##### inputs
     # halo_data (from above - needs particle lists)
@@ -220,13 +220,7 @@ def gen_delta_npart(halo_data,unique_particle_list,sim_timesteps,depth=5,trim_ho
     # trim_hoes: get rid of particles which have been part of structure before when calculating accretion rate?
 
     ##### returns
-    # halo_data with delta_m0 and delta_m1 keys
-
-
-    snaps=[]
-    for snap in range(len(halo_data)):
-        if not halo_data[snap]['Particle_IDs']==[]:
-            snaps.append(snap)
+    #list of accretion rates for each halo with key 'delta_mdm' and 'delta_mgas'
 
     def find_progen_index(index_0,snap,depth):
         id_0=halo_data[snap]['ID'][index_0]#the original id
@@ -242,57 +236,75 @@ def gen_delta_npart(halo_data,unique_particle_list,sim_timesteps,depth=5,trim_ho
              #new index at snap-depth
         return new_index
 
+
+    acc_dm=[[] for snap in snaps]
+    acc_gas=[[] for snap in snaps]
+
     # iterate through each snap
+    isnap=-1
+
     for snap in snaps:
+        isnap=isnap+1
+
         if verbose==True:
             print('Generating accretion rates for snap = ',snap)
-        
-        #final snap particle data
-        part_IDs_2=halo_data[snap]['Particle_IDs']
-        part_Types_2=halo_data[snap]['Particle_Types']
+            print(isnap/len(snaps)*100,' \% done with snaps')
+
+        #find final snap particle data
+        part_data_2=gen_particle_lists(snap,halo_data_snap=halo_data[snap],vr_directory=vr_directory,vr_prefix=vr_prefix,vr_files_type=2,vr_files_nested=False,vr_files_lz=4,verbose=1)
+        if part_data_2["Npart"]==[]:# if we can't find final particles
+            print('Final particle lists not found at snap = ',snap)
+            for ihalo in range(n_halo_2):
+                halo_tracked=False
+                part_IDs_2[ihalo]=[]
+                part_Types_2[ihalo]=[]
+            continue#go to next snap
+        part_IDs_2=part_data_2['Particle_IDs']
+        part_Types_2=part_data_2['Particle_Types']
         n_halo_2=len(halo_data[snap]['ID'])
         halo_tracked=np.zeros(n_halo_2)
 
-        #initial snap particle data
-        part_IDs_1=[[] for i in range(n_halo_2)]
-        part_Types_1=[[] for i in range(n_halo_2)]
-
-        #if initial particle lists are empty
-        if halo_data[snap-depth]['Particle_IDs']==[] or snap-depth<0:
-            if verbose==True:
-                print('No particle lists found at initial snap = ',snap-depth)
-            #record empty data
+        #find initial snap particle data
+        part_data_1=gen_particle_lists(snap-depth,halo_data_snap=halo_data[snap-depth],vr_directory=vr_directory,vr_prefix=vr_prefix,vr_files_type=2,vr_files_nested=False,vr_files_lz=4,verbose=1)
+        if snap-depth<0 or part_data_1["Npart"]==[]:# if we can't find initial particles
+            print('Initial particle lists not found at required depth (snap = ',snap-depth,')')
             for ihalo in range(n_halo_2):
                 halo_tracked=False
+                part_IDs_2[ihalo]=[]
+                part_Types_2[ihalo]=[]
+            continue#go to next snap
+
+        #if we have found both initial and final particle lists...
+        for ihalo in range(n_halo_2):
+            progen_index=find_progen_index(index_0=ihalo,snap=snap,depth=depth)
+            if progen_index>-1:
+                part_IDs_1[ihalo]=part_data_1['Particle_IDs'][progen_index]
+                part_Types_1[ihalo]=part_data_1['Particle_Types'][progen_index]
+                halo_tracked[ihalo]=True
+            else:
                 part_IDs_1[ihalo]=[]
                 part_Types_1[ihalo]=[]
-            continue
+                halo_tracked[ihalo]=False
+                continue
 
-        #if we have initial particle list, find previous particle list
-        else:
-            for ihalo in range(n_halo_2):
-                progen_index=find_progen_index(index_0=ihalo,snap=snap,depth=depth)
-                if progen_index>-1:
-                    part_IDs_1[ihalo]=halo_data[snap-depth]['Particle_IDs'][progen_index]
-                    part_Types_1[ihalo]=halo_data[snap-depth]['Particle_Types'][progen_index]
-                    halo_tracked[ihalo]=True
-                else:
-                    part_IDs_1[ihalo]=[]
-                    part_Types_1[ihalo]=[]
-                    halo_tracked[ihalo]=False
-
-        #now have part_IDs_1 and part_IDs_2
-
-        #now find accretion rate
-        delta_n_tot=[np.nan for i in range(n_halo_2)]
+        #now we finally have part_IDs_1 and part_IDs_2!
+        #now find accretion rates for this snap
         delta_m0=[np.nan for i in range(n_halo_2)]
         delta_m1=[np.nan for i in range(n_halo_2)]
-        field_halo=[[] for i in range(n_halo_2)]
+        
+        #recall particle histories for the snap depth
+        if trim_hoes:
+            try:
+                substructure_partID_list_uptosnap=unique_particle_list[snap-depth-1]["sub_ids"]
+                structure_partID_list_uptosnap=unique_particle_list[snap-depth-1]["field_ids"]
+            except:
+                print('Failed to find particle histories for trimming at snap = ',snap-depth-1)
+                continue
 
-        substructure_partID_list_uptosnap=unique_particle_list[snap-1]["sub_ids"]
-        structure_partID_list_uptosnap=unique_particle_list[snap-1]["field_ids"]
 
-        for ihalo in range(n_halo_2):#for each z=0, find accretion rate
+
+        for ihalo in range(n_halo_2):#for each halo, find accretion rate
+
             field_halo[ihalo]=halo_data[snap]['hostHaloID'][ihalo]==-1#True if dealing with field, False if dealing with Sub
             part_IDs_init=part_IDs_1[ihalo]
             part_IDs_final=part_IDs_2[ihalo]
@@ -301,11 +313,11 @@ def gen_delta_npart(halo_data,unique_particle_list,sim_timesteps,depth=5,trim_ho
 
             new_particle_IDs=np.array(np.compress(np.logical_not(np.in1d(part_IDs_final,part_IDs_init)),part_IDs_final))
             new_particle_types=np.array(np.compress(np.logical_not(np.in1d(part_IDs_final,part_IDs_init)),part_Types_final))
-
-
+            
             ################# TRIMMING PARTICLES #################
 
             if trim_hoes==True:#trim particles which have been part of substructure
+
                 if field_halo[ihalo]:#if a field halo
                     for ipart in range(len(new_particle_IDs)):#for each new particle
                         part_ID_temp=new_particle_IDs[ipart]
@@ -324,22 +336,31 @@ def gen_delta_npart(halo_data,unique_particle_list,sim_timesteps,depth=5,trim_ho
                 new_particle_IDs = np.compress(~(new_particle_IDs==-1),new_particle_IDs)
                 new_particle_types = np.compress(~(new_particle_IDs==-1),new_particle_types)
 
+
             if halo_tracked[ihalo]:
                 delta_n_tot[ihalo]=len(new_particle_IDs)
                 
                 ##### CHANGE HERE IF WE GET MORE PARTICLE TYPES
-                m_gas=mass_table[1]*10**10 #MSol
-                m_dm=mass_table[0]*10**10 #MSol
+                sim_unit_to_Msun=halo_data[0]['UnitInfo']['Mass_unit_to_solarmass']
+                m_0=mass_table[1]*sim_unit_to_Msun #MSol
+                m_1=mass_table[0]*sim_unit_to_Msun #MSol
 
-                if type_order==1:
-                    delta_m0[ihalo]=np.sum(new_particle_types==0)*m_dm
-                    delta_m1[ihalo]=np.sum(new_particle_types==1)*m_gas
-                else:
-                    delta_m0[ihalo]=np.sum(new_particle_types==1)*m_dm
-                    delta_m1[ihalo]=np.sum(new_particle_types==0)*m_gas
+                delta_m0[ihalo]=np.sum(new_particle_types==0)*m_0
+                delta_m1[ihalo]=np.sum(new_particle_types==1)*m_1
 
-        delta_t=abs(sim_timesteps['Lookback_time'][snap]-sim_timesteps['Lookback_time'][snap-depth])
-        halo_data[snap]['delta_m0_dt']=delta_m0/delta_t
-        halo_data[snap]['delta_m1_dt']=delta_m1/delta_t
+                
+        lt2=halo_data[snap]['SimulationInfo']['LookbackTime']
+        lt1=halo_data[snap-depth]['SimulationInfo']['LookbackTime']
+    
+        delta_t=abs(lt1-lt2)#Gyr
 
-    return halo_data
+        if mass_table[0]>mass_table[1]:
+            acc_dm[isnap]=delta_m0/delta_t
+            acc_gas[isnap]=delta_m1/delta_t
+        else:
+            acc_dm[isnap]=delta_m1/delta_t
+            acc_gas[isnap]=delta_m0/delta_t
+
+    return acc_dm,acc_gas
+
+
