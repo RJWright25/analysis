@@ -307,6 +307,8 @@ def gen_delta_npart(halo_data,snaps,unique_particle_list,mass_table,vr_directory
 
 
         field_halo=[np.nan for i in range(n_halo_2)]
+        delta_n_tot=[np.nan for i in range(n_halo_2)]
+        
         for ihalo in range(n_halo_2):#for each halo, find accretion rate
 
             field_halo[ihalo]=halo_data[snap]['hostHaloID'][ihalo]==-1#True if dealing with field, False if dealing with Sub
