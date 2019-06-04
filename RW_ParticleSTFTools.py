@@ -133,7 +133,7 @@ def read_vr_treefrog_data(vr_directory,vr_prefix,tf_treefile,vr_files_type=2,vr_
         print('Adding timestep info')
         scale_factors=np.array([halo_data_all[snap]['SimulationInfo']['ScaleFactor'] for snap in sim_snaps])
         print(scale_factors)
-        redshifts=z_at_value(cosmo.scale_factor,scale_factors)
+        redshifts=np.array([z_at_value(cosmo.scale_factor,scale_factors[snap]) for snap in sim_snaps])
         print(redshifts)
         lookback_times=cosmo.lookback_time(redshifts)
         print(lookback_times)
