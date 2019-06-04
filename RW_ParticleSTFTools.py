@@ -35,7 +35,8 @@ def read_sim_timesteps(run_directory,sim_type='SWIFT',snap_no=200,files_lz=4):
 
         for snap in snaps:
             particle_file_temp=h5py.File(particle_data_file_directories[snap])
-            print(particle_file_temp)
+            print(list(particle_file_temp.keys()))
+            
             time_unit_cgs=particle_file_temp['Units'].attrs['Unit time in cgs (U_t)']
             for ifield,field in enumerate(fields):
                 if ifield==0:
