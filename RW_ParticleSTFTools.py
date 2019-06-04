@@ -13,6 +13,9 @@ if True:
     # VELOCIraptor python tools 
     from RW_VRTools import *
 
+########################################################################################################################################################################
+############################################################################## READ MASS DATA ##########################################################################
+########################################################################################################################################################################
 
 def read_mass_table(run_directory,sim_type='SWIFT',snap_prefix="snap_",snap_lz=4):
 
@@ -28,7 +31,6 @@ def read_mass_table(run_directory,sim_type='SWIFT',snap_prefix="snap_",snap_lz=4
         M0=temp_file['Header']['MassTable'][0]
         M1=temp_file['Header']['MassTable'][1]
         return np.array([M0,M1])
-
 
 ##########################################################################################################################################################################
 ############################################################################## CREATE HALO DATA ##########################################################################
@@ -83,8 +85,6 @@ def read_vr_treefrog_data(vr_directory,vr_prefix,tf_treefile,vr_files_type=2,vr_
     
     if verbose==1:
         print('Finished assembling descendent tree using VR python tools')
-
-
 
     if verbose==1:
         print('Adding timestep information & finishing up')
@@ -221,6 +221,7 @@ def gen_delta_npart(halo_data,snaps,unique_particle_list,mass_table,vr_directory
 
     ##### returns
     #list of accretion rates for each halo with key 'delta_mdm' and 'delta_mgas'
+    result=[[] for i in range(len(snaps))]
 
     def find_progen_index(index_0,snap,depth):
         id_0=halo_data[snap]['ID'][index_0]#the original id
@@ -360,12 +361,8 @@ def gen_delta_npart(halo_data,snaps,unique_particle_list,mass_table,vr_directory
         delta_t=abs(lt1-lt2)#Gyr
 
         if mass_table[0]>mass_table[1]:
-            acc_dm[isnap]=np.array(delta_m0)/delta_t
-            acc_gas[isnap]=np.array(delta_m1)/delta_t
+            result[isnap]={'delta_mdm':np.array(delta_m0)/delta_t,'delta_mgas':np.array(delta_m1)/delta_t}
         else:
-            acc_dm[isnap]=np.array(delta_m1)/delta_t
-            acc_gas[isnap]=np.array(delta_m0)/delta_t
+            result[isnap]={'delta_mdm':np.array(delta_m1)/delta_t,'delta_mgas':np.array(delta_m0)/delta_t}
 
-    return acc_dm,acc_gas
-
-
+    return result
