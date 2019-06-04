@@ -7,7 +7,7 @@ if True:
     import matplotlib.pyplot as plt
     import numpy as np
     import h5py
-    from astropy import constants as const
+    from scipy import constants.physical_constants as const
     from astropy.cosmology import FlatLambdaCDM
 
     # VELOCIraptor python tools 
@@ -39,15 +39,11 @@ def read_sim_timesteps(run_directory,sim_type='SWIFT',snap_no=200,files_lz=4):
             time_unit_cgs=particle_file_temp['Units'].attrs['Unit time in cgs (U_t)']
             for ifield,field in enumerate(fields):
                 if ifield==0:
-                    sim_timesteps[fields_out[ifield]].extend(particle_file_temp['Cosmology'].attrs[field]*time_unit_cgs/(const.yr.cgs*10**9))
+                    sim_timesteps[fields_out[ifield]].extend(particle_file_temp['Cosmology'].attrs[field]*time_unit_cgs/(365.25*24*3600*10**9))
                 else:
                     sim_timesteps[fields_out[ifield]].extend(particle_file_temp['Cosmology'].attrs[field])
             particle_file_temp.close()
 
-        #mass_unit_cgs=particle_file_temp['Units']['Unit mass in cgs (U_m)']
-
-        #mass table in solar masses
-        #sim_masstable={'M0':particle_file_temp['PartType0']['Masses'][0]*mass_unit_cgs/(const.M_sun.cgs),'M1':particle_file_temp['PartType1']['Masses'][0]*mass_unit_cgs/(const.M_sun.cgs)}
 
     if sim_type=='GADGET':
         fields=['Redshift','Time']
@@ -73,8 +69,6 @@ def read_sim_timesteps(run_directory,sim_type='SWIFT',snap_no=200,files_lz=4):
 
         sim_timesteps['Lookback_time']=cosmo.lookback_time(sim_timesteps['Redshift']).astype(float)
 
-        #mass_unit_cgs=const.M_sun.cgs*10**10
-        #sim_masstable={'M0':particle_file_temp['Header'].attrs(['MassTable'][0])*mass_unit_cgs/(const.M_sun.cgs),'M1':particle_file_temp['Header'].attrs(['MassTable'][1])*mass_unit_cgs/(const.M_sun.cgs)}
 
     return sim_timesteps
 
