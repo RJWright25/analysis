@@ -212,7 +212,7 @@ def gen_part_history(halo_data,vr_directory,vr_prefix,vr_files_type=2,vr_files_n
 ############################################################################## CALC DELTA_N ##############################################################################
 ##########################################################################################################################################################################
 
-def gen_delta_npart(halo_data,snaps,unique_particle_list,mass_table,vr_directory,vr_prefix,vr_files_type=2,vr_files_nested=False,vr_files_lz=4,depth=5,trim_hoes=True,verbose=True): 
+def gen_delta_npart(halo_data,snaps,unique_particle_list,mass_table,vr_directory,vr_prefix,vr_files_type=2,vr_files_nested=False,vr_files_lz=3,depth=5,trim_hoes=True,verbose=True): 
 
     ##### inputs
     # halo_data (from above - needs particle lists)
