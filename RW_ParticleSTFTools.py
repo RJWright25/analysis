@@ -116,6 +116,7 @@ def gen_particle_lists(snap,halo_data_snap,vr_directory,vr_prefix,vr_files_type=
                 print('Particle data found for snap = ',snap)
         else:
             part_data_temp=ReadParticleDataFile(vr_directory+vr_prefix+str(snap).zfill(vr_files_lz)+"/"+vr_prefix+str(snap).zfill(vr_files_lz),ibinary=vr_files_type,iverbose=0,iparttypes=1)
+            print(vr_directory+vr_prefix+str(snap).zfill(vr_files_lz)+"/"+vr_prefix+str(snap).zfill(vr_files_lz))
             if verbose:
                 print('Particle data found for snap = ',snap)
 
@@ -170,8 +171,8 @@ def gen_part_history(halo_data,vr_directory,vr_prefix,vr_files_type=2,vr_files_n
     for snap in range(len(halo_data)):
 
         particle_data_temp=gen_particle_lists(snap=snap,halo_data_snap=halo_data[snap],vr_directory=vr_directory,vr_prefix=vr_prefix,vr_files_type=vr_files_type,vr_files_nested=vr_files_nested)
-        print(particle_data_temp)
-        if len(particle_data_temp)==0:#if no halos or no particle data
+
+        if len(particle_data_temp['Particle_IDs'])==0:#if no halos or no particle data
             field_part_ids[snap]=[]
             sub_part_ids[snap]=[]
 
