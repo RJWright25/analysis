@@ -68,9 +68,9 @@ def bin_xy(x,y,bin_edges=[],y_lop=16,y_hip=84,bin_min=5):
             lops_temp.append(np.nan)
             hips_temp.append(np.nan)
 
-    bin_output['Means']=means_temp
-    bin_output['Medians']=medians_temp
-    bin_output['Lo_P']=lops_temp
-    bin_output['Hi_P']=hips_temp
+    bin_output['Means']=np.array(means_temp)
+    bin_output['Medians']=np.array(medians_temp)
+    bin_output['Lo_P']=np.array(lops_temp)
+    bin_output['Hi_P']=np.array(hips_temp)
 
     return bin_output
