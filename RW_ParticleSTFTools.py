@@ -252,7 +252,7 @@ def gen_delta_npart(halo_data,snaps,unique_particle_list,mass_table,vr_directory
             print(isnap/len(snaps)*100,' % done with snaps')
 
         #find final snap particle data
-        part_data_2=gen_particle_lists(snap,halo_data_snap=halo_data[snap],vr_directory=vr_directory,vr_prefix=vr_prefix,vr_files_type=2,vr_files_nested=False,vr_files_lz=4,verbose=1)
+        part_data_2=gen_particle_lists(snap,halo_data_snap=halo_data[snap],vr_directory=vr_directory,vr_prefix=vr_prefix,vr_files_type=2,vr_files_nested=False,vr_files_lz=vr_files_lz,verbose=1)
         if part_data_2["Npart"]==[]:# if we can't find final particles
             print('Final particle lists not found at snap = ',snap)
             for ihalo in range(n_halo_2):
@@ -266,7 +266,7 @@ def gen_delta_npart(halo_data,snaps,unique_particle_list,mass_table,vr_directory
         halo_tracked=np.zeros(n_halo_2)
 
         #find initial snap particle data
-        part_data_1=gen_particle_lists(snap-depth,halo_data_snap=halo_data[snap-depth],vr_directory=vr_directory,vr_prefix=vr_prefix,vr_files_type=2,vr_files_nested=False,vr_files_lz=4,verbose=1)
+        part_data_1=gen_particle_lists(snap-depth,halo_data_snap=halo_data[snap-depth],vr_directory=vr_directory,vr_prefix=vr_prefix,vr_files_type=2,vr_files_nested=False,vr_files_lz=vr_files_lz,verbose=1)
         if snap-depth<0 or part_data_1["Npart"]==[]:# if we can't find initial particles
             print('Initial particle lists not found at required depth (snap = ',snap-depth,')')
             for ihalo in range(n_halo_2):
