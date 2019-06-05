@@ -73,7 +73,7 @@ def bin_xy(x,y,bin_edges=[],y_lop=16,y_hip=84,bin_min=5):
     bin_output['Lo_P']=np.array(lops_temp)
     bin_output['Hi_P']=np.array(hips_temp)
 
-    for ibin in range(bin_count):
+    for ibin in range(bin_no):
         for key in list(bin_output.keys()):
             if np.isinf(bin_output[key][ibin]):
                 bin_output[key][ibin]=np.nan
