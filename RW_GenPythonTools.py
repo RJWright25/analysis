@@ -75,7 +75,7 @@ def bin_xy(x,y,bin_edges=[],y_lop=16,y_hip=84,bin_min=5):
 
     for ibin in range(bin_no):
         for key in list(bin_output.keys()):
-            if not np.isfinite(bin_output[key][ibin]):
+            if bin_output[key][ibin]==0 and not (key=='Counts'):
                 bin_output[key][ibin]=np.nan
 
     return bin_output
