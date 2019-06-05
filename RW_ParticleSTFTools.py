@@ -24,7 +24,7 @@ def read_mass_table(run_directory,sim_type='SWIFT',snap_prefix="snap_",snap_lz=4
 
     if sim_type=='SWIFT':
         M0=temp_file['PartType0']['Masses'][0]
-        M1=temp_file['PartType1']['Masses'][0]
+        M1=temp_file['PartType1']['Masses'][1]
         return np.array([M0,M1])
 
     if sim_type=='GADGET':
@@ -116,7 +116,6 @@ def gen_particle_lists(snap,halo_data_snap,vr_directory,vr_prefix,vr_files_type=
                 print('Particle data found for snap = ',snap)
         else:
             part_data_temp=ReadParticleDataFile(vr_directory+vr_prefix+str(snap).zfill(vr_files_lz)+"/"+vr_prefix+str(snap).zfill(vr_files_lz),ibinary=vr_files_type,iverbose=0,iparttypes=1)
-            print(vr_directory+vr_prefix+str(snap).zfill(vr_files_lz)+"/"+vr_prefix+str(snap).zfill(vr_files_lz))
             if verbose:
                 print('Particle data found for snap = ',snap)
 
@@ -349,8 +348,8 @@ def gen_delta_npart(halo_data,snaps,unique_particle_list,mass_table,vr_directory
                 
                 ##### CHANGE HERE IF WE GET MORE PARTICLE TYPES
                 sim_unit_to_Msun=halo_data[0]['UnitInfo']['Mass_unit_to_solarmass']
-                m_0=mass_table[1]*sim_unit_to_Msun #MSol
-                m_1=mass_table[0]*sim_unit_to_Msun #MSol
+                m_0=mass_table[0]*sim_unit_to_Msun #MSol
+                m_1=mass_table[1]*sim_unit_to_Msun #MSol
 
                 delta_m0[ihalo]=np.sum(new_particle_types==0)*m_0
                 delta_m1[ihalo]=np.sum(new_particle_types==1)*m_1
