@@ -104,7 +104,7 @@ def read_vr_treefrog_data(vr_directory,vr_prefix,tf_treefile,vr_files_type=2,vr_
 
     return halo_data_all
 
-def gen_particle_lists(snap,halo_data_snap,vr_directory,vr_prefix,vr_files_type=2,vr_files_nested=False,vr_files_lz=4,verbose=1):
+def gen_particle_lists(snap,halo_data_snap,vr_directory,vr_prefix,vr_files_type=2,vr_files_nested=False,vr_files_lz=3,verbose=1):
     
     if verbose==True:
         print('Reading particle lists for snap = ',snap)
