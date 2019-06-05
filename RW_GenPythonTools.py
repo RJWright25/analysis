@@ -19,7 +19,7 @@ def bin_xy(x,y,bin_edges=[],y_lop=16,y_hip=84,bin_min=5):
     if bin_edges==[]:# if we're not given bins
         print('no bin edges given, generate default bin ranges')
         bin_no=bin_no_default
-        bin_edges=np.linspace(np.nanpercentile(x,2),np.nanpercentile(x,98),bin_no)
+        bin_edges=np.linspace(np.nanpercentile(x,2),np.nanpercentile(x,98),bin_no+1)
         bin_mid=np.array([bin_edges[i]+bin_edges[i+1] for i in range(bin_no)])*0.5
 
     else:
