@@ -28,8 +28,8 @@ def read_mass_table(run_directory,sim_type='SWIFT',snap_prefix="snap_",snap_lz=4
         return np.array([M0,M1])
 
     if sim_type=='GADGET':
-        M0=temp_file['Header']['MassTable'][0]
-        M1=temp_file['Header']['MassTable'][1]
+        M0=temp_file['Header'].attrs['MassTable'][0]
+        M1=temp_file['Header'].attrs['MassTable'][1]
         return np.array([M0,M1])
 
 ##########################################################################################################################################################################
