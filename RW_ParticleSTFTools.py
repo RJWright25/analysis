@@ -245,8 +245,8 @@ def gen_particle_history(halo_data,uptosnap=[],verbose=0):
                 running_list_all=np.unique(running_list_all)
                 running_list_sub=np.unique(running_list_sub)
 
-                parthist_filename_all="snap_"+str(isnap).zfill(3)+"_parthistory_all.dat"
-                parthist_filename_sub="snap_"+str(isnap).zfill(3)+"_parthistory_sub.dat"
+                parthist_filename_all="part_histories/snap_"+str(isnap).zfill(3)+"_parthistory_all.dat"
+                parthist_filename_sub="part_histories/snap_"+str(isnap).zfill(3)+"_parthistory_sub.dat"
 
                 with open(parthist_filename_all, 'wb') as parthist_file:
                     pickle.dump(running_list_all, parthist_file)
