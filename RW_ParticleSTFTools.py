@@ -210,6 +210,10 @@ def gen_particle_history(halo_data,uptosnap=[],verbose=0):
     # list (for each snap) of dictionaries (sub/field ids and types) of lists (for each bound particle) of:
     # (1) unique particle IDs of particles bound in field halos
     # (2) unique particle IDs of particles bound in subhalos
+
+    if uptosnap=[]:
+        uptosnap=len(halo_data)
+
     snap=uptosnap
     sub_part_ids=[]
     all_part_ids=[]
