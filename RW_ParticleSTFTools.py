@@ -261,6 +261,7 @@ def gen_accretion_rate(halo_data,snap,mass_table,particle_histories=[],depth=5,t
     sim_unit_to_Msun=halo_data[0]['UnitInfo']['Mass_unit_to_solarmass']
     m_0=mass_table[0]*sim_unit_to_Msun #MSol
     m_1=mass_table[1]*sim_unit_to_Msun #MSol
+    print(m_0/m_1)
 
     if trim_particles:
         if particle_histories==[]:
@@ -355,7 +356,7 @@ def gen_accretion_rate(halo_data,snap,mass_table,particle_histories=[],depth=5,t
     lt1=halo_data[snap-depth]['SimulationInfo']['LookbackTime']
     delta_t=abs(lt1-lt2)#Gyr
 
-    if mass_table[0]>mass_table[1]:#make sure m_dm is more massive
+    if mass_table[0]>mass_table[1]:#make sure m_dm is more massive (the more massive particle should be the dm particle)
         delta_m={'DM_Acc':np.array(delta_m0)/delta_t,'Gas_Acc':np.array(delta_m1)/delta_t,'dt':delta_t}
     else:
         delta_m={'DM_Acc':np.array(delta_m1)/delta_t,'Gas_Acc':np.array(delta_m0)/delta_t,'dt':delta_t}
