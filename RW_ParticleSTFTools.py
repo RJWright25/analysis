@@ -261,7 +261,6 @@ def gen_accretion_rate(halo_data,snap,mass_table,particle_histories=[],depth=5,t
     sim_unit_to_Msun=halo_data[0]['UnitInfo']['Mass_unit_to_solarmass']
     m_0=mass_table[0]*sim_unit_to_Msun #MSol
     m_1=mass_table[1]*sim_unit_to_Msun #MSol
-    print(m_0/m_1)
 
     if trim_particles:
         if particle_histories==[]:
