@@ -211,7 +211,7 @@ def gen_particle_history(halo_data,uptosnap=[],verbose=0):
     # (1) unique particle IDs of particles bound in field halos
     # (2) unique particle IDs of particles bound in subhalos
 
-    if uptosnap=[]:
+    if uptosnap==[]:
         uptosnap=len(halo_data)
 
     snap=uptosnap
@@ -277,7 +277,6 @@ def gen_accretion_rate(halo_data,snap,mass_table,particle_histories=[],depth=5,t
     m_1=mass_table[1]*sim_unit_to_Msun #MSol
 
     if trim_particles:
-
         if particle_histories==[]:
             snap_reqd=snap-depth-1
             try:##check if the files have already been generated
@@ -289,7 +288,7 @@ def gen_accretion_rate(halo_data,snap,mass_table,particle_histories=[],depth=5,t
                 with open(parthist_filename_sub, 'rb') as parthist_file:
                     substructure_history=pickle.load(parthist_file)
                     parthist_file.close()             
-            except:#if they haven't generate them and load the required snap
+            except:#if they haven't, generate them and load the required snap
                 try:
                     gen_particle_history(halo_data=halo_data,verbose=0)#generate particles which have been part of structure for all snaps (saved to file)
                     parthist_filename_all="part_histories/snap_"+str(snap_reqd).zfill(3)+"_parthistory_all.dat"
