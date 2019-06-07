@@ -8,6 +8,7 @@ if True:
     import numpy as np
     import h5py
     import pandas as pd
+    import pickle
     import astropy.units as u
     from astropy.cosmology import FlatLambdaCDM,z_at_value
 
@@ -343,8 +344,10 @@ def gen_accretion_rate(halo_data,snap,mass_table,particle_histories=[],depth=5,t
     delta_m1=[]
 
     for ihalo in range(n_halos_2):#for each halo
+
         if verbose:
             print('Done with accretion rates for ',ihalo,' halos out of ',n_halos_2)
+
         progen_index=find_progen_index(index_0=ihalo,snap=snap,depth=depth)#find progen index
         if progen_index>-1:#if progen_index is valid
             part_IDs_init=part_data_1['Particle_IDs'][progen_index]
