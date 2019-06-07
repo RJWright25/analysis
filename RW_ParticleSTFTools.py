@@ -201,7 +201,8 @@ def get_particle_lists(snap,halo_data_snap,add_subparts_to_fofs=False,verbose=1)
 ############################################################################## CREATE PARTICLE HISTORIES #################################################################
 ##########################################################################################################################################################################
 
-def gen_particle_history(snap,halo_data,verbose=0):
+def gen_particle_history(halo_data,uptosnap=[],verbose=0):
+
     ##### inputs
     # halo_data (from above)
 
@@ -209,7 +210,7 @@ def gen_particle_history(snap,halo_data,verbose=0):
     # list (for each snap) of dictionaries (sub/field ids and types) of lists (for each bound particle) of:
     # (1) unique particle IDs of particles bound in field halos
     # (2) unique particle IDs of particles bound in subhalos
-
+    snap=uptosnap
     sub_part_ids=[]
     all_part_ids=[]
 
@@ -239,8 +240,17 @@ def gen_particle_history(snap,halo_data,verbose=0):
 
                 running_list_all=np.unique(running_list_all)
                 running_list_sub=np.unique(running_list_sub)
-                
 
+                parthist_filename_all="snap_"+str(isnap).zfill(3)+"_parthistory_all.dat"
+                parthist_filename_sub="snap_"+str(isnap).zfill(3)+"_parthistory_sub.dat"
+
+                with open(parthist_filename_all, 'wb') as parthist_file:
+                    pickle.dump(running_list_all, parthist_file)
+                    parthist_file.close()
+                with open(parthist_filename_sub, 'wb') as parthist_file:
+                    pickle.dump(running_list_sub, parthist_file)
+                    parthist_file.close()                    
+                
     print('Unique particle histories created')
     return {'all_ids':running_list_all,'sub_ids':running_list_sub}
 

@@ -13,12 +13,18 @@ def flatten(array):
         result.extend(list_temp)
     return result
 
-def bin_xy(x,y,bin_edges=[],y_lop=16,y_hip=84,bin_min=5):
+def bin_xy(x,y,bins=[],y_lop=16,y_hip=84,bin_min=5):
     
     bin_no_default=10
-    if bin_edges==[]:# if we're not given bins
+
+    if bins==[]:# if we're not given bins
         print('no bin edges given, generate default bin ranges')
         bin_no=bin_no_default
+        bin_edges=np.linspace(np.nanpercentile(x,2),np.nanpercentile(x,98),bin_no+1)
+        bin_mid=np.array([bin_edges[i]+bin_edges[i+1] for i in range(bin_no)])*0.5
+
+    if type(bins)==int:
+        bin_no=bins
         bin_edges=np.linspace(np.nanpercentile(x,2),np.nanpercentile(x,98),bin_no+1)
         bin_mid=np.array([bin_edges[i]+bin_edges[i+1] for i in range(bin_no)])*0.5
 
