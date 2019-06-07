@@ -277,14 +277,32 @@ def gen_accretion_rate(halo_data,snap,mass_table,particle_histories=[],depth=5,t
     m_1=mass_table[1]*sim_unit_to_Msun #MSol
 
     if trim_particles:
+
         if particle_histories==[]:
-            try:
-                particle_history=gen_particle_history(halo_data=halo_data,snap=snap-depth-1)#obtain particles which have been part of substructure up to snap-depth-1
-                allstructure_history=particle_history['all_ids']#obtain particles which have been part of any structure up to snap-depth-1
-                substructure_history=particle_history['sub_ids']#obtain particles which have been part of sub structure up to snap-depth-1
-            except:
-                print('Failed to find particle histories for trimming at snap = ',snap-depth-1)
-                return []
+            snap_reqd=snap-depth-1
+            try:##check if the files have already been generated
+                parthist_filename_all="part_histories/snap_"+str(snap_reqd).zfill(3)+"_parthistory_all.dat"
+                parthist_filename_sub="part_histories/snap_"+str(snap_reqd).zfill(3)+"_parthistory_sub.dat"
+                with open(parthist_filename_all, 'rb') as parthist_file:
+                    allstructure_history=pickle.load(parthist_file)
+                    parthist_file.close()
+                with open(parthist_filename_sub, 'rb') as parthist_file:
+                    substructure_history=pickle.load(parthist_file)
+                    parthist_file.close()             
+            except:#if they haven't generate them and load the required snap
+                try:
+                    gen_particle_history(halo_data=halo_data,verbose=0)#generate particles which have been part of structure for all snaps (saved to file)
+                    parthist_filename_all="part_histories/snap_"+str(snap_reqd).zfill(3)+"_parthistory_all.dat"
+                    parthist_filename_sub="part_histories/snap_"+str(snap_reqd).zfill(3)+"_parthistory_sub.dat"
+                    with open(parthist_filename_all, 'rb') as parthist_file:
+                        allstructure_history=pickle.load(parthist_file)
+                        parthist_file.close()
+                    with open(parthist_filename_sub, 'rb') as parthist_file:
+                        substructure_history=pickle.load(parthist_file)
+                        parthist_file.close()             
+                except:
+                    print('Failed to find particle histories for trimming at snap = ',snap-depth-1)
+                    return []
         else:
             substructure_history=particle_histories['sub_ids']
             allstructure_history=particle_histories['all_ids']
