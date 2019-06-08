@@ -251,7 +251,7 @@ def gen_particle_history(halo_data,uptosnap=[],verbose=0):
 
                 parthist_filename_all="part_histories/snap_"+str(isnap).zfill(3)+"_parthistory_all.dat"
                 parthist_filename_sub="part_histories/snap_"+str(isnap).zfill(3)+"_parthistory_sub.dat"
-                print('Saving histories to .dat file.')
+                print('Saving histories for snap = ',str(isnap),'to .dat file.')
 
                 with open(parthist_filename_all, 'wb') as parthist_file:
                     pickle.dump(running_list_all, parthist_file)
