@@ -71,7 +71,10 @@ def gen_halo_data_all(snaps=[],tf_treefile="listtreefiles.txt",vr_directory="",v
     for isnap,snap in enumerate(sim_snaps):
         if verbose:
             print('Searching for halo data at snap = ',snap)
-
+            if vr_files_nested:
+                print('File: '+vr_directory+vr_prefix+str(snap).zfill(vr_files_lz)+"/"+vr_prefix+str(snap).zfill(vr_files_lz))
+            else:
+                print('File: '+vr_directory+vr_prefix+str(snap).zfill(vr_files_lz))
         if vr_files_nested:
             halo_data_snap=ReadPropertyFile(vr_directory+vr_prefix+str(snap).zfill(vr_files_lz)+"/"+vr_prefix+str(snap).zfill(vr_files_lz),ibinary=vr_files_type,iseparatesubfiles=0,iverbose=0, desiredfields=halo_fields, isiminfo=True, iunitinfo=True)
         else:
