@@ -248,6 +248,7 @@ def gen_particle_history(halo_data,uptosnap=[],verbose=0):
 
                 parthist_filename_all="part_histories/snap_"+str(isnap).zfill(3)+"_parthistory_all.dat"
                 parthist_filename_sub="part_histories/snap_"+str(isnap).zfill(3)+"_parthistory_sub.dat"
+                print('Saving histories to .dat file.')
 
                 with open(parthist_filename_all, 'wb') as parthist_file:
                     pickle.dump(running_list_all, parthist_file)
@@ -281,6 +282,7 @@ def gen_accretion_rate(halo_data,snap,mass_table,particle_histories=[],depth=5,t
         if particle_histories==[]:
             snap_reqd=snap-depth-1
             try:##check if the files have already been generated
+                print('Trying to find particle histories at snap = ',snap_reqd)
                 parthist_filename_all="part_histories/snap_"+str(snap_reqd).zfill(3)+"_parthistory_all.dat"
                 parthist_filename_sub="part_histories/snap_"+str(snap_reqd).zfill(3)+"_parthistory_sub.dat"
                 with open(parthist_filename_all, 'rb') as parthist_file:
@@ -288,9 +290,11 @@ def gen_accretion_rate(halo_data,snap,mass_table,particle_histories=[],depth=5,t
                     parthist_file.close()
                 with open(parthist_filename_sub, 'rb') as parthist_file:
                     substructure_history=pickle.load(parthist_file)
-                    parthist_file.close()             
+                    parthist_file.close()
+                print('Found them!')       
             except:#if they haven't, generate them and load the required snap
                 try:
+                    print('Did not find particle histories -- generating them now')       
                     gen_particle_history(halo_data=halo_data,verbose=0)#generate particles which have been part of structure for all snaps (saved to file)
                     parthist_filename_all="part_histories/snap_"+str(snap_reqd).zfill(3)+"_parthistory_all.dat"
                     parthist_filename_sub="part_histories/snap_"+str(snap_reqd).zfill(3)+"_parthistory_sub.dat"
@@ -301,7 +305,7 @@ def gen_accretion_rate(halo_data,snap,mass_table,particle_histories=[],depth=5,t
                         substructure_history=pickle.load(parthist_file)
                         parthist_file.close()             
                 except:
-                    print('Failed to find particle histories for trimming at snap = ',snap-depth-1)
+                    print('Failed to find particle histories for trimming at snap = ',snap-depth-1,'. Terminating.')
                     return []
         else:
             substructure_history=particle_histories['sub_ids']
@@ -325,7 +329,7 @@ def gen_accretion_rate(halo_data,snap,mass_table,particle_histories=[],depth=5,t
     isnap=isnap+1    
 
     if verbose:
-        print('Generating accretion rates for snap = ',snap)
+        print('Generating accretion rates for snap = ',snap,' at depth = ',depth,' trimming = ',trim_particles)
 
     #find final snap particle data
     part_data_2=get_particle_lists(snap,halo_data_snap=halo_data[snap],add_subparts_to_fofs=True,verbose=0)
@@ -395,5 +399,16 @@ def gen_accretion_rate(halo_data,snap,mass_table,particle_histories=[],depth=5,t
         delta_m={'DM_Acc':np.array(delta_m0)/delta_t,'Gas_Acc':np.array(delta_m1)/delta_t,'dt':delta_t}
     else:
         delta_m={'DM_Acc':np.array(delta_m1)/delta_t,'Gas_Acc':np.array(delta_m0)/delta_t,'dt':delta_t}
+
+    #### save to file.
+    print('Saving accretion rates to .dat file.')
+    if trim_particles:
+        with open('acc_rates/snap_'+str(snap).zfill(3)+'_accretion_trimmed_'+str(depth)+'.dat', 'wb') as acc_data_file:
+            pickle.dump(delta_m,acc_data_file)
+            acc_data_file.close()
+    else:
+        with open('acc_rates/snap_'+str(snap).zfill(3)+'_accretion_base_'+str(depth)+'.dat', 'wb') as acc_data_file:
+            pickle.dump(delta_m,acc_data_file)
+            acc_data_file.close()
 
     return delta_m
