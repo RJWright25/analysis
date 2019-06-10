@@ -276,7 +276,7 @@ def gen_accretion_rate(halo_data,snap,mass_table,particle_histories=[],depth=5,t
 
     ##### returns
     #list of accretion rates for each halo with key 'delta_mdm' and 'delta_mgas'
-
+    time_checking=0
     sim_unit_to_Msun=halo_data[0]['UnitInfo']['Mass_unit_to_solarmass']
     m_0=mass_table[0]*sim_unit_to_Msun #MSol
     m_1=mass_table[1]*sim_unit_to_Msun #MSol
@@ -367,29 +367,30 @@ def gen_accretion_rate(halo_data,snap,mass_table,particle_histories=[],depth=5,t
             continue
 
         new_particle_IDs=np.array(np.compress(np.logical_not(np.in1d(part_IDs_final,part_IDs_init)),part_IDs_final))#list of particles new to halo
-        new_particle_types=np.array(np.compress(np.logical_not(np.in1d(part_IDs_final,part_IDs_init)),part_Types_final))#list of particle types new to halo
-        
+        new_particle_Types=np.array(np.compress(np.logical_not(np.in1d(part_IDs_final,part_IDs_init)),part_Types_final))#list of particle types new to halo
+
+
         ################# TRIMMING PARTICLES #################
         #get particle histories for the snap depth (minus 1)
         if trim_particles:
             if len(substructure_history)<100:
                 print('Failed to find particle histories for trimming at snap = ',snap-depth-1)
 
+            t1=time.time()
             if halo_data[snap]['hostHaloID'][ihalo]==-1:#if a field halo
-                for ipart,part_ID_temp in enumerate(new_particle_IDs):#for each particle new to this FIELD halo
-                    if part_ID_temp in allstructure_history:#check if was ever in structure in the past
-                        new_particle_types[ipart]=-1#if so, remove type. 
+                field_mask_good=np.logical_not(np.in1d(new_particle_IDs,allstructure_history))
+                new_particle_Types=np.compress(field_mask_good,new_particle_Types)
 
             else:#if a subhalo
-                for ipart,part_ID_temp in enumerate(new_particle_IDs):#for each particle new to this SUB halo
-                    if part_ID_temp in substructure_history or part_ID_temp not in allstructure_history:#check if was in substructure in past OR has never been part of structure
-                        new_particle_types[ipart]=-1#if so, remove type. 
+                sub_mask_good=np.logical_not(np.in1d(new_particle_IDs,substructure_history))
+                new_particle_Types=np.compress(sub_mask_good,new_particle_Types)
+            t2=time.time()
 
-            new_particle_types = np.compress(np.logical_not(new_particle_IDs==-1),new_particle_types)
+            time_checking=time_checking+t2-t1
 
         ########### NOW WE HAVE THE DESIRED NEW (UNIQUE) PARTICLES FOR EACH HALO ###########
-        delta_m0_temp=np.sum(new_particle_types==0)*m_0
-        delta_m1_temp=np.sum(new_particle_types==1)*m_1
+        delta_m0_temp=np.sum(new_particle_Types==0)*m_0
+        delta_m1_temp=np.sum(new_particle_Types==1)*m_1
         delta_m0.append(delta_m0_temp)
         delta_m1.append(delta_m1_temp)
         ####################################################################################
@@ -413,5 +414,5 @@ def gen_accretion_rate(halo_data,snap,mass_table,particle_histories=[],depth=5,t
         with open('acc_rates/snap_'+str(snap).zfill(3)+'_accretion_base_'+str(depth)+'.dat', 'wb') as acc_data_file:
             pickle.dump(delta_m,acc_data_file)
             acc_data_file.close()
-
+    print(time_checking)
     return delta_m
