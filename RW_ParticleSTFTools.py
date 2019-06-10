@@ -378,11 +378,11 @@ def gen_accretion_rate(halo_data,snap,mass_table,particle_histories=[],depth=5,t
 
             t1=time.time()
             if halo_data[snap]['hostHaloID'][ihalo]==-1:#if a field halo
-                field_mask_good=np.logical_not(np.in1d(new_particle_IDs,allstructure_history))
+                field_mask_good=np.in1d(new_particle_IDs,allstructure_history,invert=True)
                 new_particle_Types=np.compress(field_mask_good,new_particle_Types)
 
             else:#if a subhalo
-                sub_mask_good=np.logical_not(np.in1d(new_particle_IDs,substructure_history))
+                sub_mask_good=np.in1d(new_particle_IDs,allstructure_history,invert=True)
                 new_particle_Types=np.compress(sub_mask_good,new_particle_Types)
             t2=time.time()
 
