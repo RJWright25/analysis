@@ -369,7 +369,7 @@ def gen_accretion_rate(halo_data,snap,mass_table,particle_histories=[],depth=5,t
         new_particle_IDs=np.array(np.compress(np.logical_not(np.in1d(part_IDs_final,part_IDs_init)),part_IDs_final))#list of particles new to halo
         new_particle_Types=np.array(np.compress(np.logical_not(np.in1d(part_IDs_final,part_IDs_init)),part_Types_final))#list of particle types new to halo
 
-
+        print('Number of new particles to halo: ',len(new_particle_IDs))
         ################# TRIMMING PARTICLES #################
         #get particle histories for the snap depth (minus 1)
         if trim_particles:
