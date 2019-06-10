@@ -268,6 +268,7 @@ def gen_particle_history(halo_data,uptosnap=[],verbose=0):
 ##########################################################################################################################################################################
 
 def gen_accretion_rate(halo_data,snap,mass_table,particle_histories=[],halo_cap=[],depth=5,trim_particles=True,verbose=1): 
+    print('Ready to accretion rates for snap = ',snap)
 
     ##### inputs
     # halo_data (from above - needs particle lists)
@@ -275,13 +276,13 @@ def gen_accretion_rate(halo_data,snap,mass_table,particle_histories=[],halo_cap=
     # trim_particles: get rid of particles which have been part of structure before when calculating accretion rate?
 
     ##### returns
-    #list of accretion rates for each halo with key 'delta_mdm' and 'delta_mgas'
+    #list of accretion rates for each halo with key 'DM_Acc' and 'Gas_Acc'
     time_checking=0
     sim_unit_to_Msun=halo_data[0]['UnitInfo']['Mass_unit_to_solarmass']
     m_0=mass_table[0]*sim_unit_to_Msun #MSol
     m_1=mass_table[1]*sim_unit_to_Msun #MSol
 
-    if trim_particles:
+    if trim_particles:#load particle histories if we need to
         if particle_histories==[]:
             snap_reqd=snap-depth-1
             try:##check if the files have already been generated
@@ -311,6 +312,7 @@ def gen_accretion_rate(halo_data,snap,mass_table,particle_histories=[],halo_cap=
                     print('Failed to find particle histories for trimming at snap = ',snap-depth-1,'. Terminating.')
                     return []
         else:
+            print('Loading supplied particle histories...')
             substructure_history=particle_histories['sub_ids']
             allstructure_history=particle_histories['all_ids']
 
@@ -332,13 +334,15 @@ def gen_accretion_rate(halo_data,snap,mass_table,particle_histories=[],halo_cap=
     isnap=isnap+1    
 
     if verbose:
-        print('Generating accretion rates for snap = ',snap,' at depth = ',depth,' trimming = ',trim_particles)
+        print('Now generating accretion rates for snap = ',snap,' at depth = ',depth,' trimming = ',trim_particles)
 
     #find final snap particle data
     part_data_2=get_particle_lists(snap,halo_data_snap=halo_data[snap],add_subparts_to_fofs=True,verbose=0)
     if halo_cap==[]:
+        print("Finding accretion rates for all halos")
         n_halos_2=len(part_data_2["Npart"])
     else:
+        print("Finding accretion rates for max of ",halo_cap," halos")
         n_halos_2=halo_cap
         
     if n_halos_2==0:# if we can't find final particles or there are no halos
