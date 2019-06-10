@@ -267,7 +267,7 @@ def gen_particle_history(halo_data,uptosnap=[],verbose=0):
 ############################################################################## CALC DELTA_N ##############################################################################
 ##########################################################################################################################################################################
 
-def gen_accretion_rate(halo_data,snap,mass_table,particle_histories=[],depth=5,trim_particles=True,verbose=1): 
+def gen_accretion_rate(halo_data,snap,mass_table,particle_histories=[],halo_cap=[],depth=5,trim_particles=True,verbose=1): 
 
     ##### inputs
     # halo_data (from above - needs particle lists)
@@ -336,7 +336,11 @@ def gen_accretion_rate(halo_data,snap,mass_table,particle_histories=[],depth=5,t
 
     #find final snap particle data
     part_data_2=get_particle_lists(snap,halo_data_snap=halo_data[snap],add_subparts_to_fofs=True,verbose=0)
-    n_halos_2=len(part_data_2["Npart"])
+    if halo_cap==[]:
+        n_halos_2=len(part_data_2["Npart"])
+    else:
+        n_halos_2=halo_cap
+        
     if n_halos_2==0:# if we can't find final particles or there are no halos
         print('Final particle lists not found at snap = ',snap)
         return []
