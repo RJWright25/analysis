@@ -29,8 +29,8 @@ def bin_xy(x,y,bins=[],y_lop=16,y_hip=84,bin_min=5):
         bin_mid=np.array([bin_edges[i]+bin_edges[i+1] for i in range(bin_no)])*0.5
 
     else:
-        bin_no=len(bin_edges)-1
-        bin_mid=np.array([bin_edges[i]+bin_edges[i+1] for i in range(bin_no)])*0.5
+        bin_no=len(bins)-1
+        bin_mid=np.array([bins[i]+bins[i+1] for i in range(bin_no)])*0.5
         print('number of bins given = ',bin_no)
 
     bin_init=np.zeros(bin_no)
