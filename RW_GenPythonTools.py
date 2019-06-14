@@ -62,6 +62,7 @@ def bin_xy(x,y,bins=[],y_lop=16,y_hip=84,bin_min=5):
         if bin_min==0 or bin_count>bin_min-1:
             count_true=True
         else:
+            print('bin at ',ibin_mid,' has insufficient numbers to calculate statistics')
             count_true=False
 
         if count_true:
