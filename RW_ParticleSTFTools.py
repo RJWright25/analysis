@@ -399,8 +399,6 @@ def gen_accretion_rate(halo_data,snap,mass_table,particle_histories=[],halo_cap=
                 new_particle_Types=np.compress(sub_mask_good,new_particle_Types)
             t2=time.time()
 
-            time_checking=time_checking+t2-t1
-
         ########### NOW WE HAVE THE DESIRED NEW (UNIQUE) PARTICLES FOR EACH HALO ###########
         delta_m0_temp=np.sum(new_particle_Types==0)*m_0
         delta_m1_temp=np.sum(new_particle_Types==1)*m_1
