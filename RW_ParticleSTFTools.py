@@ -267,7 +267,7 @@ def gen_particle_history(halo_data,uptosnap=[],verbose=0):
 ############################################################################## CALC DELTA_N ##############################################################################
 ##########################################################################################################################################################################
 
-def gen_accretion_rate(halo_data,snap,mass_table,particle_histories=[],halo_cap=[],depth=5,trim_particles=True,verbose=1): 
+def gen_accretion_rate(halo_data,snap,mass_table,particle_histories=[],halo_cap=[],halo_index_list=[],depth=5,trim_particles=True,verbose=1): 
     print('Ready to accretion rates for snap = ',snap)
 
     ##### inputs
@@ -277,7 +277,6 @@ def gen_accretion_rate(halo_data,snap,mass_table,particle_histories=[],halo_cap=
 
     ##### returns
     #list of accretion rates for each halo with key 'DM_Acc' and 'Gas_Acc'
-    time_checking=0
     sim_unit_to_Msun=halo_data[0]['UnitInfo']['Mass_unit_to_solarmass']
     m_0=mass_table[0]*sim_unit_to_Msun #MSol
     m_1=mass_table[1]*sim_unit_to_Msun #MSol
@@ -338,13 +337,17 @@ def gen_accretion_rate(halo_data,snap,mass_table,particle_histories=[],halo_cap=
 
     #find final snap particle data
     part_data_2=get_particle_lists(snap,halo_data_snap=halo_data[snap],add_subparts_to_fofs=True,verbose=0)
-    if halo_cap==[]:
+    if not halo_index_list==[]:
+        halo_index_list=halo_index_list
+        n_halos_2=len(halo_index_list)
+    elif halo_cap==[]:
         print("Finding accretion rates for all halos")
         n_halos_2=len(part_data_2["Npart"])
+        halo_index_list=list(range(n_halos_2))
     else:
-        print("Finding accretion rates for max of ",halo_cap," halos")
         n_halos_2=halo_cap
-        
+        halo_index_list=list(range(n_halos_2))
+
     if n_halos_2==0:# if we can't find final particles or there are no halos
         print('Final particle lists not found at snap = ',snap)
         return []
@@ -358,7 +361,7 @@ def gen_accretion_rate(halo_data,snap,mass_table,particle_histories=[],halo_cap=
     delta_m0=[]
     delta_m1=[]
 
-    for ihalo in range(n_halos_2):#for each halo
+    for ihalo in halo_index_list:#for each halo
 
         if verbose:
             print('Done with accretion rates for ',ihalo,' halos out of ',n_halos_2)
@@ -424,5 +427,4 @@ def gen_accretion_rate(halo_data,snap,mass_table,particle_histories=[],halo_cap=
         with open('acc_rates/snap_'+str(snap).zfill(3)+'_accretion_base_'+str(depth)+'_'+str(n_halos_2)+'.dat', 'wb') as acc_data_file:
             pickle.dump(delta_m,acc_data_file)
             acc_data_file.close()
-    print(time_checking)
     return delta_m

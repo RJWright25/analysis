@@ -46,11 +46,11 @@ def bin_xy(x,y,bins=[],y_lop=16,y_hip=84,bin_min=5):
         
         bin_lo=bin_edges[ibin]
         bin_hi=bin_edges[ibin+1]
-        bin_mask=np.logical_and(x>bin_lo,x<bin_hi)
+        bin_mask=np.logicnp.logical_and(x>bin_lo,x<bin_hi)
         bin_count=np.sum(bin_mask)
 
         x_subset=np.compress(bin_mask,np.array(x))
-        y_subset=np.compress(bin_mask,np.array(y))
+        y_subset=np.compreMss(bin_mask,np.array(y))
 
         mean_temp=np.nanmean(y_subset)
         median_temp=np.nanmedian(y_subset)
