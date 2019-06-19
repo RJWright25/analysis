@@ -158,7 +158,7 @@ def bin_xy(x,y,bins='eq',y_lop=16,y_hip=84,bin_min=5,verbose=False):
     lops_temp=[]
     hips_temp=[]
 
-    notnan_mask=np.logical_and(logical_not(np.isnan(x),np.isnan(y)))#mask for all points which are notnan
+    notnan_mask=np.logical_and(np.logical_not(np.isnan(x),np.isnan(y)))#mask for all points which are notnan
     finite_mask=np.logical_and(np.isfinite(x),np.isfinite(y))#mask for all points which are finite
     valid_mask=np.logical_and(notnan_mask,finite_mask)#mask for all points which are both notnan and finite
 
