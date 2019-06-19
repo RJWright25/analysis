@@ -155,7 +155,7 @@ def bin_xy(x,y,bins='eq',y_lop=16,y_hip=84,bin_min=5,verbose=False):
 
     #initialise outputs
     bin_init=np.zeros(bin_no)
-    bin_output={'bin_mid':bin_mid,'bin_edges':bin_edges,'Counts':bin_init,'Invalids':bin_init,Means':bin_init,'Medians':bin_init,'Lo_P':bin_init,'Hi_P':bin_init'}
+    bin_output={'bin_mid':bin_mid,'bin_edges':bin_edges,'Counts':bin_init,'Invalids':bin_init,'Means':bin_init,'Medians':bin_init,'Lo_P':bin_init,'Hi_P':bin_init}
 
     means_temp=[]
     medians_temp=[]
