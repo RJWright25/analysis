@@ -140,7 +140,7 @@ def bin_xy(x,y,bins='eq',y_lop=16,y_hip=84,bin_min=5,verbose=False):
     elif type(bins)==int or type(bins)==float: # if given an integer number of bins, then create linear bins in x from 2nd to 98th percentile of finite values
         bin_no=int(bins)
         bin_edges=np.linspace(np.nanpercentile(x_forbins,2),np.nanpercentile(x_forbins,98),bin_no+1)
-        bin_mid=np.array([bin_edges[ibin]+bin_edges[ibin+1] for i in range(bin_no)])*0.5
+        bin_mid=np.array([bin_edges[ibin]+bin_edges[ibin+1] for ibin in range(bin_no)])*0.5
         if verbose:
             print('Number of bins given = ',bin_no)
 
