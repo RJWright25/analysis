@@ -115,25 +115,28 @@ def bin_xy(x,y,bins='eq',y_lop=16,y_hip=84,bin_min=5,verbose=False):
         b=bin_no
         if verbose:
             print("Generating bins using equal count method")
-        if np.nanmin(x_forbins)==np.nanmax(x_forbins):
-            bin_edges=np.linspace(np.nanmin(x_forbins)-0.5,np.nanmax(x_forbins)+0.5,num=b)
+        if np.nanmin(x)==np.nanmax(x):
+            bin_edges=np.linspace(np.nanmin(x)-0.5,np.nanmax(x)+0.5,num=b)
         else:
             from math import ceil,floor
             from numpy import array,concatenate,cumsum,ones,sort
-            x_forbins=sort(x_forbins)
-            L=len(x_forbins)
+            x_2=sort(x)
+            L=len(x_2)
             w_l=floor(L/b)
             w_h=ceil(L/b)
             n_l=b*ceil(L/b)-L
             n_h=b-n_l
             n=concatenate([ones(ceil(n_l/2))*w_l,ones(n_h)*w_h,ones(floor(n_l/2))*w_l]).astype(int)
-            print(n)
-            bin_edges=array([np.nanmin(x_forbins)]+[(x_forbins[i-1]+x_forbins[i])/2 for i in cumsum(n)[:-1]]+[np.nanmax(x_forbins)])
-            bin_mid=np.array([bin_edges[i]+bin_edges[i+1] for i in range(bin_no)])*0.5
-        if verbose:
+            bin_edges=array([np.nanmin(x_2)]+[(x_2[i-1]+x_2[i])/2 for i in cumsum(n)[:-1]]+[np.nanmax(x_2)])
+            bin_mid=[]
+            for ibin in range(bin_no):
+                ibin_mask=np.logical_and(x<bin_edges[ibin+1],x>bin_edges[ibin])
+                x_sub_2=np.compress(ibin_mask,x_2)
+                bin_mid.append(np.nanmean(x_sub_2))
+            if verbose:
             print("Bins generated, xmin = ",bin_edges[0],', xmax = ',bin_edges[-1],' and bin no = ',bin_no)
 
-    if type(bins)==int or type(bins)==float: # if given an integer number of bins, then create linear bins in x from 2nd to 98th percentile of finite values
+    elif type(bins)==int or type(bins)==float: # if given an integer number of bins, then create linear bins in x from 2nd to 98th percentile of finite values
         bin_no=int(bins)
         bin_edges=np.linspace(np.nanpercentile(x_forbins,2),np.nanpercentile(x_forbins,98),bin_no+1)
         bin_mid=np.array([bin_edges[i]+bin_edges[i+1] for i in range(bin_no)])*0.5
