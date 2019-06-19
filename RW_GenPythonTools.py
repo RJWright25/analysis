@@ -97,6 +97,7 @@ def bin_xy(x,y,bins='eq',y_lop=16,y_hip=84,bin_min=5,verbose=False):
         print("Please enter either a list or array for x and y values")
         return []
     try:
+        print(x_hip,y_hip)
         x_hip=int(x_hip)
         y_hip=int(y_hip)
     except:
