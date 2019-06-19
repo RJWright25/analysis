@@ -111,7 +111,7 @@ def bin_xy(x,y,bins='eq',y_lop=16,y_hip=84,bin_min=5,verbose=False):
         print(x_invalid,' x values had to be removed')
 
     if bins=='eq': # if default, calculate bin edges such that there are roughly the same count of data values in each bin (code from splotch)
-        bin_no=np.floor(len(x_forbins)/50).astype(int) # should be ~ 25 objects per bin
+        bin_no=np.floor(len(x_forbins)/100).astype(int) # should be ~ 25 objects per bin
         b=bin_no
         if verbose:
             print("Generating bins using equal count method")
@@ -128,7 +128,6 @@ def bin_xy(x,y,bins='eq',y_lop=16,y_hip=84,bin_min=5,verbose=False):
             n_h=b-n_l
             n=concatenate([ones(ceil(n_l/2))*w_l,ones(n_h)*w_h,ones(floor(n_l/2))*w_l]).astype(int)
             bin_edges=array([np.nanmin(x_2)]+[(x_2[i-1]+x_2[i])/2 for i in cumsum(n)[:-1]]+[np.nanmax(x_2)])
-            print(bin_edges)
             
             bin_mid=[]
             for ibin in range(bin_no):
@@ -137,7 +136,6 @@ def bin_xy(x,y,bins='eq',y_lop=16,y_hip=84,bin_min=5,verbose=False):
 
             if verbose:
                 print("Bins generated, xmin = ",bin_edges[0],', xmax = ',bin_edges[-1],' and bin no = ',bin_no)
-            print(bin_mid)
     elif type(bins)==int or type(bins)==float: # if given an integer number of bins, then create linear bins in x from 2nd to 98th percentile of finite values
         bin_no=int(bins)
         bin_edges=np.linspace(np.nanpercentile(x_forbins,2),np.nanpercentile(x_forbins,98),bin_no+1)
