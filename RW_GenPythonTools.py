@@ -1,89 +1,208 @@
 #########################################################################################################################################################################
-############################################ 01/04/2019 Ruby Wright - Tools To Read Simulation Particle Data & Halo Properties ##########################################
+#########################################################################################################################################################################
+####################################################### 01/04/2019 Ruby Wright - Python Data Processing Tools ###########################################################
+#########################################################################################################################################################################
+#########################################################################################################################################################################
+#########################################################################################################################################################################
 
-#*** Packages ***
+# packages preamble
+import numpy as np
 
-if True:
-    import matplotlib.pyplot as plt
-    import numpy as np
+def flatten(list2d):
 
-def flatten(array):
-    result=[]
-    for list_temp in array:
-        result.extend(list_temp)
-    return result
+    """
+    flatten : function
+	----------
+    Flatten a list of lists.
+		
+	Parameters
+	----------
+	list2d : list 
+		List of lists to be flattened.
 
-def bin_xy(x,y,bins=[],y_lop=16,y_hip=84,bin_min=5):
+    Returns
+	-------
+	list2d_flattened : list
+        Flattened version of input.
+	
+	"""
+
+    ### input check
     
-    bin_no_default=10
+    if not type(x) == list:
+        print("Please enter a list of lists to flatten.")                                                                              
+        return []
+        
+    list2d_flattened=[]
+    for list_temp in list2d:
+        list2d_flattened.extend(list_temp)
+    return list2d_flattened
 
-    if bins==[]:# if we're not given bins
-        print('no bin edges given, generate default bin ranges')
-        bin_no=bin_no_default
-        bin_edges=np.linspace(np.nanpercentile(x,2),np.nanpercentile(x,98),bin_no+1)
+
+def bin_xy(x,y,bins='eq',y_lop=16,y_hip=84,bin_min=5,verbose=False):
+
+    """ 
+    bin_xy : function
+    ----------
+    Find statistics of quantity y in bins of associated quantity x. 
+		
+	Parameters
+	----------
+	x : list or ndarray 
+		independent variable to be binned
+    
+    y : list or ndarray 
+		dependent variable (function of x) to calculate statistics for
+
+    y_lop : float
+        the lower percentile to calculate
+    
+    y_hip : float
+        the upper percentile to calculate
+
+    bin_min : int or float
+        the lowest count of objects in a bin for which statistics will be calculated
+
+    Returns
+	-------
+	bin_output : dict
+        Dictionary of output statistics (all ndarray of length the number of bins):
+
+        'bin_mid': midpoint of bins
+        'bin_edges': edges of bins
+        'Counts': histogram of x values in bins
+        'Invalids': number of points deleted in each bin
+        'Means': the means of binned y values
+        'Medians': the medians of binned y values
+        'Lo_P': the lower percentile of binned y values
+        'Hi_P': the upper percentile of binned y values
+	
+	"""
+
+    ### input processing and checking
+    if not x.shape==y.shape:
+        print('Please ensure x and y values have same length')
+    if x.ndim>1 or y.ndim>1:
+        print('Please enter 1-dimensional x and y values')
+        return []
+    if not (type(bins)==list or type(bins)==str or type(bins)==int or type(bins)==float):
+        try:
+            bins=np.array(bins)#convert to numpy array if manual
+        except:
+            print("Please enter bin edges of valid type")
+    try:
+        x=np.array(x) # convert x vals to numpy array
+        y=np.array(y) # convert y vals to numpy array
+    except:
+        print("Please enter either a list or array for x and y values")
+        return []
+    try:
+        x_hip=int(x_hip)
+        y_hip=int(y_hip)
+    except:
+        print("Please enter valid lower and upper percentiles (should be 1-dimensional and of length 1)")
+        return []
+    try:
+        bin_min=int(bin_min)
+    except:
+        print("Please enter valid bin minimum (should be 1-dimensional and of length 1)")
+        return []
+
+    ### create bins
+    x_forbins=np.compress(np.logical_and(np.isfinite(x),np.logical_not(np.isnan(x))),x) # the x values to use in creating bins
+    x_invalid=len(x)-len(x_forbins)
+
+    if verbose:
+        print(x_invalid,' x values had to be removed')
+
+    if bins=='eq': # if default, calculate bin edges such that there are roughly the same count of data values in each bin (code from splotch)
+        bin_no=np.floor(len(x_forbins)/25) # should be ~ 25 objects per bin
+        b=bin_no
+        if verbose:
+            print("Generating bins using equal count method")
+        if np.nanmin(x_forbins)==np.nanmax(x_forbins):
+                bin_edges=np.linspace(np.nanmin(x_forbins)-0.5,np.nanmax(x_forbins)+0.5,num=b)
+                else:
+                    from math import ceil,floor
+                    from numpy import array,concatenate,cumsum,ones,sort
+                    x_forbins=sort(x_forbins)
+                    L=len(x_forbins)
+                    w_l=floor(L/b)
+                    w_h=ceil(L/b)
+                    n_l=b*ceil(L/b)-L
+                    n_h=b-n_l
+                    n=concatenate([ones(ceil(n_l/2))*w_l,ones(n_h)*w_h,ones(floor(n_l/2))*w_l]).astype('int32')
+                    bin_edges=array([nanmin(x_forbins)]+[(x_forbins[i-1]+x_forbins[i])/2 for i in cumsum(n)[:-1]]+[nanmax(x_forbins)])
+                    bin_mid=np.array([bin_edges[i]+bin_edges[i+1] for i in range(bin_no)])*0.5
+        if verbose:
+            print("Bins generated, xmin = ",bin_edges[0],', xmax = ',bin_edges[-1],' and bin no = ',bin_no)
+
+    if type(bins)==int or type(bins)==float: # if given an integer number of bins, then create linear bins in x from 2nd to 98th percentile of finite values
+        bin_no=int(bins)
+        bin_edges=np.linspace(np.nanpercentile(x_forbins,2),np.nanpercentile(x_forbins,98),bin_no+1)
         bin_mid=np.array([bin_edges[i]+bin_edges[i+1] for i in range(bin_no)])*0.5
+        if verbose:
+            print('Number of bins given = ',bin_no)
 
-    if type(bins)==int:
-        bin_no=bins
-        bin_edges=np.linspace(np.nanpercentile(x,2),np.nanpercentile(x,98),bin_no+1)
-        bin_mid=np.array([bin_edges[i]+bin_edges[i+1] for i in range(bin_no)])*0.5
-
-    else:
+    elif type(bins)==list or type(bins)==np.ndarray: # if given bin edges manually
         bin_no=len(bins)-1
         bin_mid=np.array([bins[i]+bins[i+1] for i in range(bin_no)])*0.5
         bin_edges=bins
-        print('number of bins given = ',bin_no)
 
+        if verbose:
+            print('Number of bins given = ',bin_no)
+
+
+    #initialise outputs
     bin_init=np.zeros(bin_no)
-    bin_output={'bin_mid':bin_mid,'bin_edges':bin_edges,'Counts':bin_init,'Means':bin_init,'Medians':bin_init,'Lo_P':bin_init,'Hi_P':bin_init}
+    bin_output={'bin_mid':bin_mid,'bin_edges':bin_edges,'Counts':bin_init,'Invalids':bin_init,Means':bin_init,'Medians':bin_init,'Lo_P':bin_init,'Hi_P':bin_init}
 
     means_temp=[]
     medians_temp=[]
     lops_temp=[]
     hips_temp=[]
 
-    for ibin,ibin_mid in enumerate(bin_mid):
+    notnan_mask=np.logical_and(logical_not(np.isnan(x),np.isnan(y)))#mask for all points which are notnan
+    finite_mask=np.logical_and(np.isfinite(x),np.isfinite(y))#mask for all points which are finite
+    valid_mask=np.logical_and(notnan_mask,finite_mask)#mask for all points which are both notnan and finite
+
+    for ibin,ibin_mid in enumerate(bin_mid):#loop through each bin
         
-        bin_lo=bin_edges[ibin]
-        bin_hi=bin_edges[ibin+1]
-        bin_mask=np.logical_and(np.logical_and(x>bin_lo,x<bin_hi),np.logical_not(np.isnan(x)))
-        bin_count=np.sum(bin_mask)
+        bin_lo=bin_edges[ibin]#lower bin value
+        bin_hi=bin_edges[ibin+1]#upper bin value
+        
+        bin_mask=np.logical_and(np.logical_and(x>bin_lo,x<bin_hi))#mask for all points within x bin
+        bin_count_gross=np.sum(bin_mask)
+        bin_mask=np.logical_and(bin_mask,valid_mask)#mask for all valid points in x bin
+        bin_count=np.sum(bin_mask)#count of selected objects
 
         x_subset=np.compress(bin_mask,np.array(x))
         y_subset=np.compress(bin_mask,np.array(y))
 
-        mean_temp=np.nanmean(y_subset)
-        median_temp=np.nanmedian(y_subset)
-        lop_temp=np.nanpercentile(y_subset,y_lop)
-        hip_temp=np.nanpercentile(y_subset,y_hip)
+        mean_temp=np.nanmean(y_subset)#calculate mean
+        median_temp=np.nanmedian(y_subset)#calculate median
+        lop_temp=np.nanpercentile(y_subset,y_lop)#calculate lower percentile
+        hip_temp=np.nanpercentile(y_subset,y_hip)#calculate upper percentile
 
-        bin_output['Counts'][ibin]=bin_count
+        bin_output['Counts'][ibin]=bin_count#count of valid points in this bin
+        bin_output['Invalids'][ibin]=bin_count_gross-bin_count#count of invalid points in this bin (probably something wrong with y vals)
 
         if bin_min==0 or bin_count>bin_min-1:
-            count_true=True
-        else:
-            count_true=False
-
-        if count_true:
             means_temp.append(mean_temp)
             medians_temp.append(median_temp)
             lops_temp.append(lop_temp)
-            hips_temp.append(hip_temp)
+            hips_temp.append(hip_temp)        
         else:
-            print('appending nan to ibin =',ibin,', count = ',bin_count)
             means_temp.append(np.nan)
             medians_temp.append(np.nan)
             lops_temp.append(np.nan)
             hips_temp.append(np.nan)
+            if verbose:
+                print("Insufficient count in bin at x = ",ibin_mid)
 
     bin_output['Means']=np.array(means_temp)
     bin_output['Medians']=np.array(medians_temp)
     bin_output['Lo_P']=np.array(lops_temp)
     bin_output['Hi_P']=np.array(hips_temp)
-
-    for ibin in range(bin_no):
-        for key in list(bin_output.keys()):
-            if bin_output[key][ibin]==0 and not (key=='Counts'):
-                bin_output[key][ibin]=np.nan
 
     return bin_output
