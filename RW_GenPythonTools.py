@@ -131,9 +131,7 @@ def bin_xy(x,y,bins='eq',y_lop=16,y_hip=84,bin_min=5,verbose=False):
             
             bin_mid=[]
             for ibin in range(bin_no):
-                ibin_mask=np.logical_and(x<bin_edges[ibin+1],x>bin_edges[ibin])
-                x_sub_2=np.compress(ibin_mask,x_2)
-                bin_mid.append(np.nanmean(x_sub_2))
+                bin_mid.append(bin_edges[i]*0.5+bin_edges[i+1]*0.5)
 
             if verbose:
                 print("Bins generated, xmin = ",bin_edges[0],', xmax = ',bin_edges[-1],' and bin no = ',bin_no)
