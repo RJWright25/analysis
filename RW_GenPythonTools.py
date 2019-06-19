@@ -116,24 +116,24 @@ def bin_xy(x,y,bins='eq',y_lop=16,y_hip=84,bin_min=5,verbose=False):
         print(x_invalid,' x values had to be removed')
 
     if bins=='eq': # if default, calculate bin edges such that there are roughly the same count of data values in each bin (code from splotch)
-        bin_no=np.floor(len(x_forbins)/25) # should be ~ 25 objects per bin
+        bin_no=np.floor(len(x_forbins)/30) # should be ~ 25 objects per bin
         b=bin_no
         if verbose:
             print("Generating bins using equal count method")
         if np.nanmin(x_forbins)==np.nanmax(x_forbins):
-                bin_edges=np.linspace(np.nanmin(x_forbins)-0.5,np.nanmax(x_forbins)+0.5,num=b)
-                else:
-                    from math import ceil,floor
-                    from numpy import array,concatenate,cumsum,ones,sort
-                    x_forbins=sort(x_forbins)
-                    L=len(x_forbins)
-                    w_l=floor(L/b)
-                    w_h=ceil(L/b)
-                    n_l=b*ceil(L/b)-L
-                    n_h=b-n_l
-                    n=concatenate([ones(ceil(n_l/2))*w_l,ones(n_h)*w_h,ones(floor(n_l/2))*w_l]).astype('int32')
-                    bin_edges=array([nanmin(x_forbins)]+[(x_forbins[i-1]+x_forbins[i])/2 for i in cumsum(n)[:-1]]+[nanmax(x_forbins)])
-                    bin_mid=np.array([bin_edges[i]+bin_edges[i+1] for i in range(bin_no)])*0.5
+            bin_edges=np.linspace(np.nanmin(x_forbins)-0.5,np.nanmax(x_forbins)+0.5,num=b)
+        else:
+            from math import ceil,floor
+            from numpy import array,concatenate,cumsum,ones,sort
+            x_forbins=sort(x_forbins)
+            L=len(x_forbins)
+            w_l=floor(L/b)
+            w_h=ceil(L/b)
+            n_l=b*ceil(L/b)-L
+            n_h=b-n_l
+            n=concatenate([ones(ceil(n_l/2))*w_l,ones(n_h)*w_h,ones(floor(n_l/2))*w_l]).astype('int32')
+            bin_edges=array([nanmin(x_forbins)]+[(x_forbins[i-1]+x_forbins[i])/2 for i in cumsum(n)[:-1]]+[nanmax(x_forbins)])
+            bin_mid=np.array([bin_edges[i]+bin_edges[i+1] for i in range(bin_no)])*0.5
         if verbose:
             print("Bins generated, xmin = ",bin_edges[0],', xmax = ',bin_edges[-1],' and bin no = ',bin_no)
 
