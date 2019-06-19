@@ -131,7 +131,7 @@ def bin_xy(x,y,bins='eq',y_lop=16,y_hip=84,bin_min=5,verbose=False):
             
             bin_mid=[]
             for ibin in range(bin_no):
-                bin_mid.append(bin_edges[i]*0.5+bin_edges[i+1]*0.5)
+                bin_mid.append(bin_edges[ibin]*0.5+bin_edges[ibin+1]*0.5)
 
             if verbose:
                 print("Bins generated, xmin = ",bin_edges[0],', xmax = ',bin_edges[-1],' and bin no = ',bin_no)
