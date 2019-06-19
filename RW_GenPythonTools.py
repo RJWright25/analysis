@@ -167,7 +167,7 @@ def bin_xy(x,y,bins='eq',y_lop=16,y_hip=84,bin_min=5,verbose=False):
         bin_lo=bin_edges[ibin]#lower bin value
         bin_hi=bin_edges[ibin+1]#upper bin value
         
-        bin_mask=np.logical_and(np.logical_and(x>bin_lo,x<bin_hi))#mask for all points within x bin
+        bin_mask=np.logical_and(x>bin_lo,x<bin_hi)#mask for all points within x bin
         bin_count_gross=np.sum(bin_mask)
         bin_mask=np.logical_and(bin_mask,valid_mask)#mask for all valid points in x bin
         bin_count=np.sum(bin_mask)#count of selected objects
