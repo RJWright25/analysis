@@ -128,13 +128,15 @@ def bin_xy(x,y,bins='eq',y_lop=16,y_hip=84,bin_min=5,verbose=False):
             n_h=b-n_l
             n=concatenate([ones(ceil(n_l/2))*w_l,ones(n_h)*w_h,ones(floor(n_l/2))*w_l]).astype(int)
             bin_edges=array([np.nanmin(x_2)]+[(x_2[i-1]+x_2[i])/2 for i in cumsum(n)[:-1]]+[np.nanmax(x_2)])
+            
             bin_mid=[]
             for ibin in range(bin_no):
                 ibin_mask=np.logical_and(x<bin_edges[ibin+1],x>bin_edges[ibin])
                 x_sub_2=np.compress(ibin_mask,x_2)
                 bin_mid.append(np.nanmean(x_sub_2))
+
             if verbose:
-            print("Bins generated, xmin = ",bin_edges[0],', xmax = ',bin_edges[-1],' and bin no = ',bin_no)
+                print("Bins generated, xmin = ",bin_edges[0],', xmax = ',bin_edges[-1],' and bin no = ',bin_no)
 
     elif type(bins)==int or type(bins)==float: # if given an integer number of bins, then create linear bins in x from 2nd to 98th percentile of finite values
         bin_no=int(bins)
