@@ -39,7 +39,7 @@ def flatten(list2d):
     return list2d_flattened
 
 
-def bin_xy(x,y,bins='eq',bin_range=[],n_per_bin=100,y_lop=16,y_hip=84,bin_min=5,verbose=False):
+def bin_xy(x,y,xy_mask=[],bins='eq',bin_range=[],n_per_bin=100,y_lop=16,y_hip=84,bin_min=5,verbose=False):
 
     """ 
     bin_xy : function
@@ -91,8 +91,12 @@ def bin_xy(x,y,bins='eq',bin_range=[],n_per_bin=100,y_lop=16,y_hip=84,bin_min=5,
         except:
             print("Please enter bin edges of valid type")
     try:
-        x=np.array(x) # convert x vals to numpy array
-        y=np.array(y) # convert y vals to numpy array
+        if xy_mask==[]:
+            x=np.array(x) # convert x vals to numpy array
+            y=np.array(y) # convert y vals to numpy array
+        else:
+            x=np.compress(xy_mask,x)
+            y=np.compress(xy_mask,y)
     except:
         print("Please enter either a list or array for x and y values")
         return []
