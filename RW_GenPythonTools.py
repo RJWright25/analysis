@@ -39,7 +39,7 @@ def flatten(list2d):
     return list2d_flattened
 
 
-def bin_xy(x,y,bins='eq',y_lop=16,y_hip=84,bin_min=5,verbose=False):
+def bin_xy(x,y,bins='eq',bin_range=[],n_per_bin=100,y_lop=16,y_hip=84,bin_min=5,verbose=False):
 
     """ 
     bin_xy : function
@@ -111,7 +111,8 @@ def bin_xy(x,y,bins='eq',y_lop=16,y_hip=84,bin_min=5,verbose=False):
         print(x_invalid,' x values had to be removed')
 
     if bins=='eq': # if default, calculate bin edges such that there are roughly the same count of data values in each bin (code from splotch)
-        bin_no=np.floor(len(x_forbins)/25).astype(int) # should be ~ 25 objects per bin
+
+        bin_no=np.floor(len(x_forbins)/n_per_bin).astype(int) # should be ~ 100 objects per bin
         b=bin_no
         if verbose:
             print("Generating bins using equal count method")
@@ -127,8 +128,11 @@ def bin_xy(x,y,bins='eq',y_lop=16,y_hip=84,bin_min=5,verbose=False):
             n_l=b*ceil(L/b)-L
             n_h=b-n_l
             n=concatenate([ones(ceil(n_l/2))*w_l,ones(n_h)*w_h,ones(floor(n_l/2))*w_l]).astype(int)
-            bin_edges=array([np.nanmin(x_2)]+[(x_2[i-1]+x_2[i])/2 for i in cumsum(n)[:-1]]+[np.nanmax(x_2)])
-            
+            if bin_range==[]:
+                bin_edges=array([np.nanmin(x_2)]+[(x_2[i-1]+x_2[i])/2 for i in cumsum(n)[:-1]]+[np.nanmax(x_2)])
+            else:
+                bin_edges=array([bin_range[0]]+[(x_2[i-1]+x_2[i])/2 for i in cumsum(n)[:-1]]+[bin_range[1]])
+
             bin_mid=[]
             for ibin in range(bin_no):
                 x_val_bin=np.compress(np.logical_and(x>bin_edges[ibin],x<bin_edges[ibin+1]),x)
