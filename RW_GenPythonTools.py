@@ -29,7 +29,7 @@ def flatten(list2d):
 
     ### input check
     
-    if not type(x) == list:
+    if not type(list2d) == list:
         print("Please enter a list of lists to flatten.")                                                                              
         return []
         
