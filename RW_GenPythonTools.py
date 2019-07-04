@@ -171,8 +171,9 @@ def bin_xy(x,y,xy_mask=[],bins='eq',bin_range=[],n_per_bin=100,y_lop=16,y_hip=84
     hips_temp=[]
 
     notnan_mask=np.logical_and(np.logical_not(np.isnan(x)),np.logical_not(np.isnan(y)))#mask for all points which are notnan
-    finite_mask=np.logical_and(np.isfinite(x),np.isfinite(y))#mask for all points which are finite
-    valid_mask=np.logical_and(notnan_mask,finite_mask)#mask for all points which are both notnan and finite
+    #finite_mask=np.logical_and(np.isfinite(x),np.isfinite(y))#mask for all points which are finite
+    #valid_mask=np.logical_and(notnan_mask)#mask for all points which are both notnan and finite
+    valid_mask=notnan_mask
 
     for ibin,ibin_mid in enumerate(bin_mid):#loop through each bin
         
