@@ -108,7 +108,7 @@ def bin_xy(x,y,xy_mask=[],bins='eq',bin_range=[],n_per_bin=100,y_lop=16,y_hip=84
         return []
 
     ### create bins
-    x_forbins=np.compress(np.logical_and(np.isfinite(x),np.logical_not(np.isnan(x))),x) # the x values to use in creating bins
+    x_forbins=np.compress(np.logical_not(np.isnan(x)),x) # the x values to use in creating bins
     x_invalid=len(x)-len(x_forbins)
 
     if verbose:
@@ -170,10 +170,10 @@ def bin_xy(x,y,xy_mask=[],bins='eq',bin_range=[],n_per_bin=100,y_lop=16,y_hip=84
     lops_temp=[]
     hips_temp=[]
 
-    notnan_mask=np.logical_and(np.logical_not(np.isnan(x)),np.logical_not(np.isnan(y)))#mask for all points which are notnan
+    #notnan_mask=np.logical_and(np.logical_not(np.isnan(x)),np.logical_not(np.isnan(y)))#mask for all points which are notnan
     #finite_mask=np.logical_and(np.isfinite(x),np.isfinite(y))#mask for all points which are finite
     #valid_mask=np.logical_and(notnan_mask)#mask for all points which are both notnan and finite
-    valid_mask=notnan_mask
+    valid_mask=np.ones(len(x))
 
     for ibin,ibin_mid in enumerate(bin_mid):#loop through each bin
         
