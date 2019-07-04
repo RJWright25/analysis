@@ -182,9 +182,7 @@ def bin_xy(x,y,xy_mask=[],bins='eq',bin_range=[],n_per_bin=100,y_lop=16,y_hip=84
         
         bin_mask=np.logical_and(x>bin_lo,x<bin_hi)#mask for all points within x bin
         bin_count_gross=np.sum(bin_mask)
-        print(ibin_mid,bin_count_gross)
-        bin_mask=np.logical_and(bin_mask,valid_mask)#mask for all valid points in x bin
-        bin_count=np.sum(bin_mask)#count of selected objects
+        bin_count=bin_count_gross#count of selected objects
 
         x_subset=np.compress(bin_mask,np.array(x))
         y_subset=np.compress(bin_mask,np.array(y))
