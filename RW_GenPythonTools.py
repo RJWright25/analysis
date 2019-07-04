@@ -181,7 +181,7 @@ def bin_xy(x,y,xy_mask=[],bins='eq',bin_range=[],n_per_bin=100,y_lop=16,y_hip=84
         bin_hi=bin_edges[ibin+1]#upper bin value
         
         bin_mask=np.logical_and(x>bin_lo,x<bin_hi)#mask for all points within x bin
-        bin_count_gross=np.sum(bin_mask)
+        bin_count_gross=np.nansum(bin_mask)
         bin_count=bin_count_gross#count of selected objects
 
         x_subset=np.compress(bin_mask,np.array(x))
