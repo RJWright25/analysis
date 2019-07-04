@@ -183,7 +183,6 @@ def bin_xy(x,y,xy_mask=[],bins='eq',bin_range=[],n_per_bin=100,y_lop=16,y_hip=84
         bin_mask=np.logical_and(x>bin_lo,x<bin_hi).astype(int)#mask for all points within x bin
         bin_count_gross=np.nansum(bin_mask)
         bin_count=bin_count_gross#count of selected objects
-        print(bin_count)
 
         x_subset=np.compress(bin_mask,np.array(x))
         y_subset=np.compress(bin_mask,np.array(y))
@@ -213,5 +212,6 @@ def bin_xy(x,y,xy_mask=[],bins='eq',bin_range=[],n_per_bin=100,y_lop=16,y_hip=84
     bin_output['Medians']=np.array(medians_temp)
     bin_output['Lo_P']=np.array(lops_temp)
     bin_output['Hi_P']=np.array(hips_temp)
+    print(bin_output["Counts"])
 
     return bin_output
