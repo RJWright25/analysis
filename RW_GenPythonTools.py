@@ -166,16 +166,16 @@ def bin_xy(x,y,xy_mask=[],bins='eq',bin_range=[],n_per_bin=100,y_lop=16,y_hip=84
     bin_output={'bin_mid':bin_mid,'bin_edges':bin_edges,'Counts':bin_init,'Invalids':bin_init,'Means':bin_init,'Medians':bin_init,'Lo_P':bin_init,'Hi_P':bin_init}
 
     bin_counts_temp=[]
+    bin_invalids_temp=[]
     means_temp=[]
     medians_temp=[]
     lops_temp=[]
     hips_temp=[]
 
-    #notnan_mask=np.logical_and(np.logical_not(np.isnan(x)),np.logical_not(np.isnan(y)))#mask for all points which are notnan
+    notnan_mask=np.logical_and(np.logical_not(np.isnan(x)),np.logical_not(np.isnan(y)))#mask for all points which are notnan
     #finite_mask=np.logical_and(np.isfinite(x),np.isfinite(y))#mask for all points which are finite
-    #valid_mask=np.logical_and(notnan_mask)#mask for all points which are both notnan and finite
-    valid_mask=np.ones(len(x))
-
+    valid_mask=notnan_mask#mask for all points which are both notnan and finite
+    
     for ibin,ibin_mid in enumerate(bin_mid):#loop through each bin
         
         bin_lo=bin_edges[ibin]#lower bin value
@@ -183,7 +183,8 @@ def bin_xy(x,y,xy_mask=[],bins='eq',bin_range=[],n_per_bin=100,y_lop=16,y_hip=84
         
         bin_mask=np.logical_and(x>bin_lo,x<bin_hi).astype(int)#mask for all points within x bin
         bin_count_gross=np.nansum(bin_mask)
-        bin_count=bin_count_gross#count of selected objects
+        bin_mask=np.logical_and(bin_mask,valid_mask)
+        bin_count=np.nansum(bin_mask)#count of selected objects (where y is also notnan)
 
         x_subset=np.compress(bin_mask,np.array(x))
         y_subset=np.compress(bin_mask,np.array(y))
@@ -194,6 +195,7 @@ def bin_xy(x,y,xy_mask=[],bins='eq',bin_range=[],n_per_bin=100,y_lop=16,y_hip=84
         hip_temp=np.nanpercentile(y_subset,y_hip)#calculate upper percentile
 
         bin_counts_temp.append(bin_count)
+        bin_invalids_temp.append(bin_count_gross-bin_count)
 
         if bin_min==0 or bin_count>bin_min-1:
             means_temp.append(mean_temp)
@@ -209,6 +211,7 @@ def bin_xy(x,y,xy_mask=[],bins='eq',bin_range=[],n_per_bin=100,y_lop=16,y_hip=84
                 print("Insufficient count in bin at x = ",ibin_mid)
 
     bin_output['Counts']=np.array(bin_counts_temp)
+    bin_output['Invalids']=np.array(bin_invalids_temp)
     bin_output['Means']=np.array(means_temp)
     bin_output['Medians']=np.array(medians_temp)
     bin_output['Lo_P']=np.array(lops_temp)
