@@ -194,7 +194,7 @@ def bin_xy(x,y,xy_mask=[],bins='eq',bin_range=[],n_per_bin=100,y_lop=16,y_hip=84
 
         bin_output['Counts'][ibin]=bin_count#count of valid points in this bin
         bin_output['Invalids'][ibin]=bin_count_gross-bin_count#count of invalid points in this bin (probably something wrong with y vals)
-        print(bin_output['Counts'])
+        print(bin_output['Counts'][ibin])
         if bin_min==0 or bin_count>bin_min-1:
             means_temp.append(mean_temp)
             medians_temp.append(median_temp)
