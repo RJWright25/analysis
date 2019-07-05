@@ -165,6 +165,7 @@ def bin_xy(x,y,xy_mask=[],bins='eq',bin_range=[],n_per_bin=100,y_lop=16,y_hip=84
     bin_init=np.zeros(bin_no)
     bin_output={'bin_mid':bin_mid,'bin_edges':bin_edges,'Counts':bin_init,'Invalids':bin_init,'Means':bin_init,'Medians':bin_init,'Lo_P':bin_init,'Hi_P':bin_init}
 
+    bin_counts_temp=[]
     means_temp=[]
     medians_temp=[]
     lops_temp=[]
@@ -192,10 +193,8 @@ def bin_xy(x,y,xy_mask=[],bins='eq',bin_range=[],n_per_bin=100,y_lop=16,y_hip=84
         lop_temp=np.nanpercentile(y_subset,y_lop)#calculate lower percentile
         hip_temp=np.nanpercentile(y_subset,y_hip)#calculate upper percentile
 
-        bin_output['Counts'][ibin]=bin_count#count of valid points in this bin
-        bin_output['Invalids'][ibin]=bin_count_gross-bin_count#count of invalid points in this bin (probably something wrong with y vals)
-        print(bin_count)
-        print(bin_output['Counts'][ibin])
+        bin_counts_temp.append(bin_count)
+
         if bin_min==0 or bin_count>bin_min-1:
             means_temp.append(mean_temp)
             medians_temp.append(median_temp)
@@ -209,6 +208,7 @@ def bin_xy(x,y,xy_mask=[],bins='eq',bin_range=[],n_per_bin=100,y_lop=16,y_hip=84
             if verbose:
                 print("Insufficient count in bin at x = ",ibin_mid)
 
+    bin_output['Counts']=np.array(bin_counts_temp)
     bin_output['Means']=np.array(means_temp)
     bin_output['Medians']=np.array(medians_temp)
     bin_output['Lo_P']=np.array(lops_temp)
