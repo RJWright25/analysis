@@ -225,5 +225,6 @@ axlabels={'m200':r'$M_{200}/M_{\odot}$',
 'm200_nfunction':r'${\rm d}n/{\rm d}\log{(M_{200}/M_{\odot})}$'+'\n'+r'$[h^3{\rm Mpc}^{-3}{\rm dex}^{-1}]$',
 'mdotgas':r'$\dot{M}_{\rm Gas}\ [M_{\odot}{\rm Gyr}^{-1}]$'
 'fb':r'$f_{\rm b}$'
+'rrel_sub':r'$R_{rm COM,\ sub}/R_{\rm 200,\ host}$'
 'rrel_nfunction':r'${\rm d}n/{\rm d}(R_{rm sub}/R_{200})$'+'\n'+r'$[h^3{\rm Mpc}^{-3}]$'
 }
