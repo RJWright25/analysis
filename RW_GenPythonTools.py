@@ -41,6 +41,7 @@ def flatten(list2d):
 
 def bin_xy(x,y,xy_mask=[],bins='eq',bin_range=[],n_per_bin=100,y_lop=16,y_hip=84,bin_min=5,verbose=False):
 
+
     """ 
     bin_xy : function
     ----------
@@ -217,3 +218,11 @@ def bin_xy(x,y,xy_mask=[],bins='eq',bin_range=[],n_per_bin=100,y_lop=16,y_hip=84
     bin_output['Hi_P']=np.array(hips_temp)
 
     return bin_output
+
+
+######### plotting common axes #########
+axlabels={'m200':r'$M_{200}/M_{\odot}$',
+'m200_massfunction':r'${\rm d}n/{\rm d}\log{(M_{200}/M_{\odot})}$'+'\n'+r'$[h^3{\rm Mpc}^{-3}{\rm dex}^{-1}]$',
+'mdotgas':r'$\dot{M}_{\rm Gas}\ [M_{\odot}{\rm Gyr}^{-1}]$'
+'fb':r'$f_{\rm b}$'
+}
