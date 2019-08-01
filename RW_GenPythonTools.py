@@ -193,7 +193,7 @@ def bin_xy(x,y,xy_mask=[],bins=[],bin_range=[],y_lop=16,y_hip=84,bin_min=5,verbo
     bin_output['Medians']=np.array(medians_temp)
     bin_output['Lo_P']=np.array(lops_temp)
     bin_output['Hi_P']=np.array(hips_temp)
-    bin_output['yerr']=np.array(hips_temp)
+    bin_output['yerr']=np.transpose(np.array(yerrs_temp))
 
     return bin_output
 
