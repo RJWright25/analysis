@@ -206,6 +206,6 @@ axlabels={'m200':r'$M_{200}/M_{\odot}$',
 'rrel_sub':r'$|r_{\rm COM,\ sub}-r_{\rm COM,\ host}|/R_{\rm 200,\ host}$',
 'rrel_nfunction':r'${\rm d}n/{\rm d}(R_{rm sub}/R_{200})$'+'\n'+r'$[h^3{\rm Mpc}^{-3}]$',
 'n_mpc':r'$N_{\rm Halos}/{\rm Mpc}^3$',
-'eff':r'$\dot{M}_{\rm Gas}/{f_{\rm b}\ M_{200}}\ [{\rm Gyr}^{-1}]$'
+'eff':r'$\dot{M}_{\rm Gas}/M_{200}}\ [{\rm Gyr}^{-1}]$'
 
 }
