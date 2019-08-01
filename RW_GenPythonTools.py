@@ -183,7 +183,7 @@ def bin_xy(x,y,xy_mask=[],bins=[],bin_range=[],y_lop=16,y_hip=84,bin_min=5,verbo
             medians_temp.append(np.nan)
             lops_temp.append(np.nan)
             hips_temp.append(np.nan)
-            yerrs_temp.append([np.nan.np.nan])
+            yerrs_temp.append([np.nan,np.nan])
             if verbose:
                 print("Insufficient count in bin at x = ",ibin_mid)
 
