@@ -39,8 +39,7 @@ def flatten(list2d):
     return list2d_flattened
 
 
-def bin_xy(x,y,xy_mask=[],bins='eq',bin_range=[],n_per_bin=100,y_lop=16,y_hip=84,bin_min=5,verbose=False):
-
+def bin_xy(x,y,xy_mask=[],bins=[],bin_range=[],y_lop=16,y_hip=84,bin_min=5,verbose=False):
 
     """ 
     bin_xy : function
@@ -115,40 +114,14 @@ def bin_xy(x,y,xy_mask=[],bins='eq',bin_range=[],n_per_bin=100,y_lop=16,y_hip=84
     if verbose:
         print(x_invalid,' x values had to be removed')
 
-    if bins=='eq': # if default, calculate bin edges such that there are roughly the same count of data values in each bin (code from splotch)
 
-        bin_no=np.floor(len(x_forbins)/n_per_bin).astype(int) # should be ~ 100 objects per bin
-        b=bin_no
-        if verbose:
-            print("Generating bins using equal count method")
-        if np.nanmin(x)==np.nanmax(x):
-            bin_edges=np.linspace(np.nanmin(x)-0.5,np.nanmax(x)+0.5,num=b)
-        else:
-            from math import ceil,floor
-            from numpy import array,concatenate,cumsum,ones,sort
-            x_2=sort(x)
-            L=len(x_2)
-            w_l=floor(L/b)
-            w_h=ceil(L/b)
-            n_l=b*ceil(L/b)-L
-            n_h=b-n_l
-            n=concatenate([ones(ceil(n_l/2))*w_l,ones(n_h)*w_h,ones(floor(n_l/2))*w_l]).astype(int)
-            if bin_range==[]:
-                bin_edges=array([np.nanmin(x_2)]+[(x_2[i-1]+x_2[i])/2 for i in cumsum(n)[:-1]]+[np.nanmax(x_2)])
-            else:
-                bin_edges=array([bin_range[0]]+[(x_2[i-1]+x_2[i])/2 for i in cumsum(n)[:-1]]+[bin_range[1]])
-
-            bin_mid=[]
-            for ibin in range(bin_no):
-                x_val_bin=np.compress(np.logical_and(x>bin_edges[ibin],x<bin_edges[ibin+1]),x)
-                bin_mid.append(np.nanmedian(x_val_bin))
-
-            if verbose:
-                print("Bins generated, xmin = ",bin_edges[0],', xmax = ',bin_edges[-1],' and bin no = ',bin_no)
-
-    elif type(bins)==int or type(bins)==float: # if given an integer number of bins, then create linear bins in x from 2nd to 98th percentile of finite values
+    if type(bins)==int or type(bins)==float: # if given an integer number of bins, then create linear bins in x from 2nd to 98th percentile of finite values
         bin_no=int(bins)
-        bin_edges=np.linspace(np.nanpercentile(x_forbins,2),np.nanpercentile(x_forbins,98),bin_no+1)
+        if bin_range==[]:
+            bin_edges=np.linspace(np.nanpercentile(x_forbins,2),np.nanpercentile(x_forbins,98),bin_no+1)
+        else:
+            bin_edges=np.linspace(bin_range[0],bin_range[1],bin_no+1)
+            
         bin_mid=np.array([bin_edges[ibin]+bin_edges[ibin+1] for ibin in range(bin_no)])*0.5
         if verbose:
             print('Number of bins given = ',bin_no)
@@ -172,6 +145,7 @@ def bin_xy(x,y,xy_mask=[],bins='eq',bin_range=[],n_per_bin=100,y_lop=16,y_hip=84
     medians_temp=[]
     lops_temp=[]
     hips_temp=[]
+    yerrs_temp=[]
 
     finite_mask=np.logical_and(np.isfinite(x),np.isfinite(y))#mask for all points which are notnan
     valid_mask=finite_mask#mask for all points which are both notnan and finite
@@ -193,6 +167,7 @@ def bin_xy(x,y,xy_mask=[],bins='eq',bin_range=[],n_per_bin=100,y_lop=16,y_hip=84
         median_temp=np.nanmedian(y_subset)#calculate median
         lop_temp=np.nanpercentile(y_subset,y_lop)#calculate lower percentile
         hip_temp=np.nanpercentile(y_subset,y_hip)#calculate upper percentile
+        yerr_temp=[median_temp-lop_temp,hip_temp-median_temp]#yerr for errbar
 
         bin_counts_temp.append(bin_count)
         bin_invalids_temp.append(bin_count_gross-bin_count)
@@ -202,11 +177,13 @@ def bin_xy(x,y,xy_mask=[],bins='eq',bin_range=[],n_per_bin=100,y_lop=16,y_hip=84
             medians_temp.append(median_temp)
             lops_temp.append(lop_temp)
             hips_temp.append(hip_temp)        
+            yerrs_temp.append(yerr_temp)        
         else:
             means_temp.append(np.nan)
             medians_temp.append(np.nan)
             lops_temp.append(np.nan)
             hips_temp.append(np.nan)
+            yerrs_temp.append(np.nan)
             if verbose:
                 print("Insufficient count in bin at x = ",ibin_mid)
 
@@ -216,6 +193,7 @@ def bin_xy(x,y,xy_mask=[],bins='eq',bin_range=[],n_per_bin=100,y_lop=16,y_hip=84
     bin_output['Medians']=np.array(medians_temp)
     bin_output['Lo_P']=np.array(lops_temp)
     bin_output['Hi_P']=np.array(hips_temp)
+    bin_output['yerr']=np.array(hips_temp)
 
     return bin_output
 
