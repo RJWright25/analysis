@@ -200,7 +200,7 @@ def bin_xy(x,y,xy_mask=[],bins=[],bin_range=[],y_lop=16,y_hip=84,bin_min=5,verbo
 
 ######### plotting common axes #########
 axlabels={'m200':r'$M_{200}/M_{\odot}$',
-'m200_nfunction':r'${\rm d}n/{\rm d}\log{(M_{200}/M_{\odot})}$'+'\n'+r'$[h^3{\rm Mpc}^{-3}{\rm dex}^{-1}]$',
+'m200_nfunction':r'${\rm d}n/{\rm d}\log{(M_{200}/M_{\odot})}$'+'\n'+r'$[{\rm Mpc}^{-3}{\rm dex}^{-1}]$',
 'fb':r'$f_{\rm b}$ (Accreted Matter)',
 'mdotgas':r'$\dot{M}_{\rm Gas}\ [M_{\odot}{\rm Gyr}^{-1}]$',
 'rrel_sub':r'$|r_{\rm COM,\ sub}-r_{\rm COM,\ host}|/R_{\rm 200,\ host}$',
