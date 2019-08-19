@@ -7,6 +7,7 @@
 
 # packages preamble
 import numpy as np
+import pickle as pickle
 
 def flatten(list2d):
 
