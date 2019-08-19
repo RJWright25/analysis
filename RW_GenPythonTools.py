@@ -198,6 +198,14 @@ def bin_xy(x,y,xy_mask=[],bins=[],bin_range=[],y_lop=16,y_hip=84,bin_min=5,verbo
     return bin_output
 
 
+def open_pickle(path):
+    with open(path,'rb') as picklefile:
+        pickledata=pickle.load(picklefile)
+        picklefile.close()
+
+    return pickledata
+
+
 ######### plotting common axes #########
 axlabels={'m200':r'$M_{200}/M_{\odot}$',
 'm200_nfunction':r'${\rm d}n/{\rm d}\log{(M_{200}/M_{\odot})}$'+'\n'+r'$[{\rm Mpc}^{-3}{\rm dex}^{-1}]$',
@@ -209,3 +217,5 @@ axlabels={'m200':r'$M_{200}/M_{\odot}$',
 'eff':r'$\dot{M}_{\rm Gas}/M_{200}\ [{\rm Gyr}^{-1}]$'
 
 }
+
+
