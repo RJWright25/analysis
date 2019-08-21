@@ -270,7 +270,7 @@ def gen_indices_mp(index_list,n_processes):
         index_list=list(index_list)
 
     n_indices=len(index_list)
-    num_rem=n_halos%n_processes
+    num_rem=n_indices%n_processes
     n_indices_per_process=int(n_indices/n_processes)
 
     #initialising loop variables
