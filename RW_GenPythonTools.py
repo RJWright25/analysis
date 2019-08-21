@@ -206,6 +206,13 @@ def open_pickle(path):
 
     return pickledata
 
+def dump_pickle(data,path):
+    with open(path,'wb') as picklefile:
+        pickle.dump(path,data)
+        picklefile.close()
+    return data
+
+
 
 ######### plotting common axes #########
 axlabels={'m200':r'$M_{200}/M_{\odot}$',
