@@ -8,6 +8,9 @@
 # packages preamble
 import numpy as np
 import pickle as pickle
+from bisect import bisect_left
+
+
 
 def flatten(list2d):
 
@@ -211,6 +214,29 @@ def dump_pickle(data,path):
         pickle.dump(data,picklefile)
         picklefile.close()
     return data
+
+
+
+def binary_search_1(element,sorted_array):
+    expected_index=np.searchsorted(element,sorted_array)
+    element_at_expected_index=sorted_array[expected_index]
+    if element_at_expected_index==element:
+        return expected_index
+    else:
+        return None
+
+def binary_search_2(element,sorted_array, lo=0, hi=None):   # can't use a to specify default for hi
+    hi = hi if hi is not None else len(a) # hi defaults to len(a)   
+
+    expected_index = bisect_left(sorted_array,element,lo,hi)          # find insertion position
+    element_at_expected_index=sorted_array[expected_index]
+
+    if element_at_expected_index==element:
+        return expected_index
+    else:
+        return None
+
+
 
 
 
