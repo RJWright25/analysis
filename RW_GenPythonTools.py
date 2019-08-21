@@ -208,7 +208,7 @@ def open_pickle(path):
 
 def dump_pickle(data,path):
     with open(path,'wb') as picklefile:
-        pickle.dump(path,data)
+        pickle.dump(picklefile,data)
         picklefile.close()
     return data
 
