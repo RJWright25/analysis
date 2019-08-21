@@ -218,7 +218,7 @@ def dump_pickle(data,path):
 
 
 def binary_search_1(element,sorted_array):
-    expected_index=np.searchsorted(element,sorted_array)
+    expected_index=np.searchsorted(sorted_array,element)
     element_at_expected_index=sorted_array[expected_index]
     if element_at_expected_index==element:
         return expected_index
