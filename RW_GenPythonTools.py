@@ -226,7 +226,7 @@ def binary_search_1(element,sorted_array):
         return None
 
 def binary_search_2(element,sorted_array, lo=0, hi=None):   # can't use a to specify default for hi
-    hi = hi if hi is not None else len(a) # hi defaults to len(a)   
+    hi = hi if hi is not None else len(sorted_array) # hi defaults to len(a)   
 
     expected_index = bisect_left(sorted_array,element,lo,hi)          # find insertion position
     element_at_expected_index=sorted_array[expected_index]
