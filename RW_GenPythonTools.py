@@ -220,9 +220,9 @@ def dump_pickle(data,path):
 def binary_search_1(elements,sorted_array):
     expected_indices=np.searchsorted(sorted_array,elements)
     expected_indices_checked=[]
-    for expected_index in expected_indices:
+    for ielement,expected_index in enumerate(expected_indices):
         element_at_expected_index=sorted_array[expected_index]
-        if element_at_expected_index==element:
+        if element_at_expected_index==elements[ielement]:
             expected_indices_checked.append(expected_index)
         else:
             expected_indices_checked.append(np.nan)
