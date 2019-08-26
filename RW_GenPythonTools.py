@@ -227,12 +227,12 @@ def binary_search_1(elements,sorted_array):
         else:
             expected_indices_checked.append(np.nan)
     return expected_indices_checked
-    
+
 def binary_search_2(elements,sorted_array, lo=0, hi=None):   # can't use a to specify default for hi
     hi = hi if hi is not None else len(sorted_array) # hi defaults to len(a)   
     expected_indices=[]
     expected_indices = bisect_left(sorted_array,elements,lo,hi)          # find insertion position
-    for expected index in expected_indices:
+    for expected_index in expected_indices:
         element_at_expected_index=[sorted_array[expected_index] for expected_index in expected_indices]
 
 
