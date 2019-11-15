@@ -236,4 +236,3 @@ RW_axlabs={
 'deltam_norm':r'$\frac{{\Delta M_{\rm baryon,\ FOF}\ ({\rm inflow})-\Delta M_{\rm baryon,\ FOF}\ ({\rm outflow})}/{\Delta t}}{M_{\rm 200,\ crit}}$'
 }
 
-    12  
