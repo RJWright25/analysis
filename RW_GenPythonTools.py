@@ -7,10 +7,22 @@
 
 # packages preamble
 import numpy as np
-import pickle as pickle
-from bisect import bisect_left
 
+def gen_bins(lo,hi,n,log=False,symlog=False):
+    bin_output=dict()
+    bin_output['edges']=np.linspace(lo,hi,n+1)
+    bin_output['size']=bin_output['edges'][1]-bin_output['edges'][0]
+    bin_output['mid']=(bin_output['edges']+bin_output['size']/2)[:n]
+    bin_output['width']=np.array([bin_output['edges'][ibin+1]-bin_output['edges'][ibin] for ibin in range(n)])
 
+    if log:
+        bin_output['edges']=10**bin_output['edges']
+        bin_output['mid']=10**bin_output['mid']
+        if symlog:
+            bin_output['edges']=np.array(flatten([-bin_output['edges'][::-1],bin_output['edges']]))
+            bin_output['mid']=[bin_output['edges'][i+1]*0.5+bin_output['edges'][i]*0.5 for i in range(len(bin_output['edges'])-1)]
+            
+    return bin_output
 
 def flatten(list2d):
 
@@ -41,7 +53,6 @@ def flatten(list2d):
     for list_temp in list2d:
         list2d_flattened.extend(list_temp)
     return list2d_flattened
-
 
 def bin_xy(x,y,xy_mask=[],bins=[],bin_range=[],y_lop=16,y_hip=84,bin_min=5,verbose=False):
 
@@ -201,125 +212,28 @@ def bin_xy(x,y,xy_mask=[],bins=[],bin_range=[],y_lop=16,y_hip=84,bin_min=5,verbo
 
     return bin_output
 
-
-def open_pickle(path):
-    with open(path,'rb') as picklefile:
-        pickledata=pickle.load(picklefile)
-        picklefile.close()
-
-    return pickledata
-
-def dump_pickle(data,path):
-    with open(path,'wb') as picklefile:
-        pickle.dump(data,picklefile)
-        picklefile.close()
-    return data
-
-
-
-def binary_search_1(elements,sorted_array):
-    expected_indices=np.searchsorted(sorted_array,elements)
-    expected_indices_checked=[]
-    for ielement,expected_index in enumerate(expected_indices):
-        element_at_expected_index=sorted_array[expected_index]
-        if element_at_expected_index==elements[ielement]:
-            expected_indices_checked.append(expected_index)
-        else:
-            expected_indices_checked.append(np.nan)
-    return expected_indices_checked
-
-def binary_search_2(element,sorted_array, lo=0, hi=None):   # can't use a to specify default for hi
-    hi = hi if hi is not None else len(sorted_array) # hi defaults to len(a)   
-    expected_index = bisect_left(sorted_array,element,lo,hi)          # find insertion position
-    element_at_expected_index=sorted_array[expected_index]
-    if element_at_expected_index==element:
-        return expected_index
-    else:
-        return np.nan
+def get_methods(object, spacing=20): 
+  methodList = [] 
+  for method_name in dir(object): 
+    try: 
+        if callable(getattr(object, method_name)): 
+            methodList.append(str(method_name)) 
+    except: 
+        methodList.append(str(method_name)) 
+  processFunc = (lambda s: ' '.join(s.split())) or (lambda s: s) 
+  for method in methodList: 
+    try: 
+        print(str(method.ljust(spacing)) + ' ' + 
+              processFunc(str(getattr(object, method).__doc__)[0:90])) 
+    except: 
+        print(method.ljust(spacing) + ' ' + ' getattr() failed')
 
 
-########################### INDEX LISTS GENERATOR FOR MP ###########################
-
-def gen_indices_mp(index_list,n_processes):
-    """
-
-    gen_halo_indices_mp : function
-	----------
-
-    Generate list of lists of desired indices divided amongst a given amount of processes.
-
-	Parameters
-	----------
-    index_list : list or int
-        If list, a list of integer halo indices to divide.
-        If int, a list of integer halo indices up to the int is generated.
-
-    n_processes : int
-        Number of processes (likely number of cores) to distribute halo indices across. 
-
-    Returns
-	----------
-    output_index_lists : list of lists
-        The resulting halo index lists for each process. 
-
-    """
-    # Create halo index list from integer or provided list
-    if type(index_list)==int:
-        index_list=list(range(index_list))
-    else:
-        index_list=list(index_list)
-
-    n_indices=len(index_list)
-    num_rem=n_indices%n_processes
-    n_indices_per_process=int(n_indices/n_processes)
-
-    #initialising loop variables
-    last_index=0
-    i_index_lists=[]
-    output_index_lists=[]
-
-    #loop for each process to generate halo index lists
-    for iprocess in range(n_processes):
-        if num_rem==0: #if there's an exact multiple of halos as cpu cores then distribute evenly
-            indices_temp=list(range(iprocess*n_indices_per_process,(iprocess+1)*n_indices_per_process))
-            i_index_lists.append(indices_temp)
-            index_list_temp=[index_list[index_temp] for index_temp in indices_temp]
-            output_index_lists.append(index_list_temp)
-
-        else: #otherwise split halos evenly except last process
-            if iprocess<num_rem:
-                indices_temp=list(range(last_index,last_index+n_indices_per_process+1))
-                i_index_lists.append(indices_temp)
-                last_index=indices_temp[-1]+1
-                index_list_temp=[all_[index_temp] for index_temp in indices_temp]
-                output_index_lists.append(halo_index_list_temp)
-
-            else:
-                indices_temp=list(range(last_index,last_index+n_halos_per_process))
-                i_index_lists.append(indices_temp)
-                last_index=indices_temp[-1]+1
-                index_list_temp=[all_halo_indices[index_temp] for index_temp in indices_temp]
-                output_index_lists.append(halo_index_list_temp)
-
-    return output_index_lists
-
-
-
-
-
-
-
-
-######### plotting common axes #########
-axlabels={'m200':r'$M_{200}/M_{\odot}$',
-'m200_nfunction':r'${\rm d}n/{\rm d}\log{(M_{200}/M_{\odot})}$'+'\n'+r'$[{\rm Mpc}^{-3}{\rm dex}^{-1}]$',
-'fb':r'$f_{\rm b}$ (Accreted Matter)',
-'mdotgas':r'$\dot{M}_{\rm Gas}\ [M_{\odot}{\rm Gyr}^{-1}]$',
-'rrel_sub':r'$|r_{\rm COM,\ sub}-r_{\rm COM,\ host}|/R_{\rm 200,\ host}$',
-'rrel_nfunction':r'${\rm d}n/{\rm d}(R_{rm sub}/R_{200})$'+'\n'+r'$[h^3{\rm Mpc}^{-3}]$',
-'n_mpc':r'$N_{\rm Halos}/{\rm Mpc}^3$',
-'eff':r'$\dot{M}_{\rm Gas}/M_{200}\ [{\rm Gyr}^{-1}]$'
-
+RW_axlabs={
+'M200':r'$M_{\rm 200,\ crit}/M_{\odot}$',
+'accrate_bar':r'$\frac{\Delta M_{\rm baryon,\ FOF}\ ({\rm inflow})}{\Delta t}$',
+'acceff_bar':r'$\frac{\Delta M_{\rm baryon,\ FOF}/{\Delta t}\ ({\rm inflow})}{f_{\rm b}\ M_{\rm 200}}\ [{\rm Gyr}^{-1}]$',
+'deltam_norm':r'$\frac{{\Delta M_{\rm baryon,\ FOF}\ ({\rm inflow})-\Delta M_{\rm baryon,\ FOF}\ ({\rm outflow})}/{\Delta t}}{M_{\rm 200,\ crit}}$'
 }
 
-
+    12  
