@@ -7,6 +7,8 @@
 
 # packages preamble
 import numpy as np
+import matplotlib.colors as mcolors
+import matplotlib.pyplot as plt
 
 def gen_bins(lo,hi,n,log=False,symlog=False):
     bin_output=dict()
@@ -152,10 +154,12 @@ def bin_xy(x,y,xy_mask=[],bins=[],bin_range=[],y_lop=16,y_hip=84,bin_min=5,verbo
 
     #initialise outputs
     bin_init=np.zeros(bin_no)
-    bin_output={'bin_mid':bin_mid,'bin_edges':bin_edges,'Counts':bin_init,'Invalids':bin_init,'Means':bin_init,'Medians':bin_init,'Lo_P':bin_init,'Hi_P':bin_init}
+    bin_output={'bin_mid':bin_mid,'bin_edges':bin_edges,'bin_means':bin_init,'bin_medians':bin_init,'Counts':bin_init,'Invalids':bin_init,'Means':bin_init,'Medians':bin_init,'Lo_P':bin_init,'Hi_P':bin_init}
 
     bin_counts_temp=[]
     bin_invalids_temp=[]
+    xmeans_temp=[]
+    xmedians_temp=[]
     means_temp=[]
     medians_temp=[]
     lops_temp=[]
@@ -178,6 +182,9 @@ def bin_xy(x,y,xy_mask=[],bins=[],bin_range=[],y_lop=16,y_hip=84,bin_min=5,verbo
         x_subset=np.compress(bin_mask,np.array(x))
         y_subset=np.compress(bin_mask,np.array(y))
 
+        xmean_temp=np.nanmean(x_subset)
+        xmedian_temp=np.nanmedian(x_subset)
+
         mean_temp=np.nanmean(y_subset)#calculate mean
         median_temp=np.nanmedian(y_subset)#calculate median
         lop_temp=np.nanpercentile(y_subset,y_lop)#calculate lower percentile
@@ -188,12 +195,16 @@ def bin_xy(x,y,xy_mask=[],bins=[],bin_range=[],y_lop=16,y_hip=84,bin_min=5,verbo
         bin_invalids_temp.append(bin_count_gross-bin_count)
 
         if bin_min==0 or bin_count>bin_min-1:
+            xmeans_temp.append(xmean_temp)
+            xmedians_temp.append(xmedian_temp)
             means_temp.append(mean_temp)
             medians_temp.append(median_temp)
             lops_temp.append(lop_temp)
             hips_temp.append(hip_temp)        
             yerrs_temp.append(yerr_temp)        
         else:
+            xmeans_temp.append(np.nan)
+            xmedians_temp.append(np.nan)
             means_temp.append(np.nan)
             medians_temp.append(np.nan)
             lops_temp.append(np.nan)
@@ -204,6 +215,8 @@ def bin_xy(x,y,xy_mask=[],bins=[],bin_range=[],y_lop=16,y_hip=84,bin_min=5,verbo
 
     bin_output['Counts']=np.array(bin_counts_temp)
     bin_output['Invalids']=np.array(bin_invalids_temp)
+    bin_output['bin_means']=np.array(xmeans_temp)
+    bin_output['bin_medians']=np.array(xmedians_temp)
     bin_output['Means']=np.array(means_temp)
     bin_output['Medians']=np.array(medians_temp)
     bin_output['Lo_P']=np.array(lops_temp)
@@ -211,6 +224,33 @@ def bin_xy(x,y,xy_mask=[],bins=[],bin_range=[],y_lop=16,y_hip=84,bin_min=5,verbo
     bin_output['yerr']=np.transpose(np.array(yerrs_temp))
 
     return bin_output
+
+def bin_2dimage(x,y,z,xedges,yedges):
+    nbins_x=len(xedges)-1
+    nbins_y=len(yedges)-1
+    nbins=nbins_x*nbins_y
+    output={'Means':np.zeros((nbins_y,nbins_x)),'Medians':np.zeros((nbins_y,nbins_x)),'Lo_P':np.zeros((nbins_y,nbins_x)),'Hi_P':np.zeros((nbins_y,nbins_x)),'Count':np.zeros((nbins_y,nbins_x))}
+    for ixbin in range(nbins_x):
+        xlo=xedges[ixbin]
+        xhi=xedges[ixbin+1]
+        xmid=(xhi+xlo)/2
+        ixbin_mask=np.logical_and(x>xlo,x<xhi)
+
+        for iybin in range(nbins_y):
+            ylo=yedges[iybin]
+            yhi=yedges[iybin+1]
+            ymid=(yhi+ylo)/2
+            iybin_mask=np.logical_and(y>ylo,y<yhi)
+            ibin_mask=np.where(np.logical_and(ixbin_mask,iybin_mask))
+            ibin_z=z[ibin_mask]
+
+            z_count=len(ibin_z);output['Count'][iybin,ixbin]=z_count
+            z_mean=np.nanmean(ibin_z);output['Means'][iybin,ixbin]=z_mean
+            z_median=np.nanmedian(ibin_z);output['Medians'][iybin,ixbin]=z_median
+            z_lop=np.nanpercentile(ibin_z,16);output['Lo_P'][iybin,ixbin]=z_lop
+            z_hip=np.nanpercentile(ibin_z,84);output['Hi_P'][iybin,ixbin]=z_hip
+
+    return output
 
 def get_methods(object, spacing=20): 
   methodList = [] 
@@ -228,6 +268,54 @@ def get_methods(object, spacing=20):
     except: 
         print(method.ljust(spacing) + ' ' + ' getattr() failed')
 
+def diverge_map(high=(0.565, 0.392, 0.173), low=(0.094, 0.310, 0.635)):
+    '''
+    low and high are colors that will be used for the two
+    ends of the spectrum. they can be either color strings
+    or rgb color tuples
+    '''
+    c = mcolors.ColorConverter().to_rgb
+    low = c(low)
+    high = c(high)
+    return make_colormap([low, high])
+    
+def diverge_map_grey(high=(0.565, 0.392, 0.173), low=(0.094, 0.310, 0.635)):
+    '''
+    low and high are colors that will be used for the two
+    ends of the spectrum. they can be either color strings
+    or rgb color tuples
+    '''
+    c = mcolors.ColorConverter().to_rgb
+    low = c(low)
+    high = c(high)
+    return make_colormap([low,c('dimgrey'), high])
+
+def diverge_map_list(clist):
+    '''
+    low and high are colors that will be used for the two
+    ends of the spectrum. they can be either color strings
+    or rgb color tuples
+    '''
+    c = mcolors.ColorConverter().to_rgb
+    colorlist=[c(col) for col in clist]
+    return make_colormap(colorlist)
+
+
+def make_colormap(seq):
+    """Return a LinearSegmentedColormap
+    seq: a sequence of floats and RGB-tuples. The floats should be increasing
+    and in the interval (0,1).
+    """
+    seq = [(None,) * 3, 0.0] + list(seq) + [1.0, (None,) * 3]
+    cdict = {'red': [], 'green': [], 'blue': []}
+    for i, item in enumerate(seq):
+        if isinstance(item, float):
+            r1, g1, b1 = seq[i - 1]
+            r2, g2, b2 = seq[i + 1]
+            cdict['red'].append([item, r1, r2])
+            cdict['green'].append([item, g1, g2])
+            cdict['blue'].append([item, b1, b2])
+    return mcolors.LinearSegmentedColormap('CustomMap', cdict)
 
 RW_axlabs={
 'M200':r'$M_{\rm 200,\ crit}/M_{\odot}$',
