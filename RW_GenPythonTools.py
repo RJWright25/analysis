@@ -1,4 +1,4 @@
-#########################################################################################################################################################################
+########################################################################################################################################################################
 #########################################################################################################################################################################
 ####################################################### 01/04/2019 Ruby Wright - Python Data Processing Tools ###########################################################
 #########################################################################################################################################################################
@@ -9,6 +9,8 @@
 import numpy as np
 import matplotlib.colors as mcolors
 import matplotlib.pyplot as plt
+from astropy.stats import bootstrap
+from matplotlib.colors import ListedColormap
 
 def gen_bins(lo,hi,n,log=False,symlog=False):
     bin_output=dict()
@@ -56,7 +58,7 @@ def flatten(list2d):
         list2d_flattened.extend(list_temp)
     return list2d_flattened
 
-def bin_xy(x,y,xy_mask=[],bins=[],bin_range=[],y_lop=16,y_hip=84,bin_min=5,verbose=False):
+def bin_xy(x,y,xy_mask=[],bins=[],bin_range=[],y_lop=16,y_hip=84,bs=0,bin_min=5,verbose=False):
 
     """ 
     bin_xy : function
@@ -154,7 +156,7 @@ def bin_xy(x,y,xy_mask=[],bins=[],bin_range=[],y_lop=16,y_hip=84,bin_min=5,verbo
 
     #initialise outputs
     bin_init=np.zeros(bin_no)
-    bin_output={'bin_mid':bin_mid,'bin_edges':bin_edges,'bin_means':bin_init,'bin_medians':bin_init,'Counts':bin_init,'Invalids':bin_init,'Means':bin_init,'Medians':bin_init,'Lo_P':bin_init,'Hi_P':bin_init}
+    bin_output={'bin_mid':bin_mid,'bin_edges':bin_edges,'bin_means':np.zeros(bin_no),'bin_medians':np.zeros(bin_no),'Counts':np.zeros(bin_no),'Invalids':np.zeros(bin_no),'Means':np.zeros(bin_no),'Medians':np.zeros(bin_no),'Lo_P':np.zeros(bin_no),'Hi_P':np.zeros(bin_no),'bs_Lo_P_Median':np.zeros(bin_no)+np.nan,'bs_Hi_P_Median':np.zeros(bin_no)+np.nan}
 
     bin_counts_temp=[]
     bin_invalids_temp=[]
@@ -181,6 +183,20 @@ def bin_xy(x,y,xy_mask=[],bins=[],bin_range=[],y_lop=16,y_hip=84,bin_min=5,verbo
 
         x_subset=np.compress(bin_mask,np.array(x))
         y_subset=np.compress(bin_mask,np.array(y))
+
+
+        if bs:
+            if ibin==0:
+                print('Doing bootstrap...')
+            if bin_count>5:                    
+                sample_results=bootstrap(y_subset,bootnum=bs,samples=int(np.floor(len(y_subset)/2)),bootfunc=np.nanmedian)
+                bs_lo_p=np.nanpercentile(sample_results,16)
+                bs_hi_p=np.nanpercentile(sample_results,84)
+                bin_output['bs_Lo_P_Median'][ibin]=bs_lo_p
+                bin_output['bs_Hi_P_Median'][ibin]=bs_hi_p
+            else:
+                bin_output['bs_Lo_P_Median'][ibin]=np.nan
+                bin_output['bs_Hi_P_Median'][ibin]=np.nan
 
         xmean_temp=np.nanmean(x_subset)
         xmedian_temp=np.nanmedian(x_subset)
@@ -324,3 +340,21 @@ RW_axlabs={
 'deltam_norm':r'$\frac{{\Delta M_{\rm baryon,\ FOF}\ ({\rm inflow})-\Delta M_{\rm baryon,\ FOF}\ ({\rm outflow})}/{\Delta t}}{M_{\rm 200,\ crit}}$'
 }
 
+def make_cmap_totrans(c):
+    c = list(mcolors.ColorConverter().to_rgba(c))
+    clist=[c]*256
+    for iic,ic in enumerate(clist):
+        ic=np.array(ic)
+        ic[3]=iic/len(clist)
+        clist[iic]=tuple(ic)
+    newcmp=ListedColormap(clist)
+    return newcmp
+def make_cmap_toblk(c):
+    c = list(mcolors.ColorConverter().to_rgba(c))
+    clist=[c]*256
+    for iic,ic in enumerate(clist):
+        ic=np.array(ic)
+        ic[:3]=iic/len(clist)*ic[:3]
+        clist[iic]=tuple(ic)
+    newcmp=ListedColormap(clist)
+    return newcmp
