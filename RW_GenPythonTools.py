@@ -358,3 +358,16 @@ def make_cmap_toblk(c):
         clist[iic]=tuple(ic)
     newcmp=ListedColormap(clist)
     return newcmp
+
+
+#find excess function
+def find_excess(x,y,x_edges):
+    mean_ys=bin_xy(x=x,y=y,bins=x_edges)['Medians']
+    x_bin=np.zeros(len(y)).astype(int)-1
+    for iix,ix in enumerate(x):
+        whichbin=np.where(np.logical_and(ix>x_edges[:-1],ix<x_edges[1:]))
+        if len(whichbin[0])==1:
+            x_bin[iix]=whichbin[0][0]
+    mean_y_forx=np.array([mean_ys[ix_bin] for ix_bin in x_bin])
+    y_normalised=y/(mean_y_forx+1e-10)
+    return y_normalised
