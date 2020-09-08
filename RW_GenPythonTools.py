@@ -358,6 +358,15 @@ def make_cmap_toblk(c):
         clist[iic]=tuple(ic)
     newcmp=ListedColormap(clist)
     return newcmp
+def make_cmap_towte(c):
+    c = list(mcolors.ColorConverter().to_rgba(c))
+    clist=[c]*256
+    for iic,ic in enumerate(clist):
+        ic=np.array(ic)
+        ic[:3]=1-iic/len(clist)*ic[:3]
+        clist[iic]=tuple(ic)
+    newcmp=ListedColormap(clist)
+    return newcmp
 
 
 #find excess function
