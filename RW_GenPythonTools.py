@@ -28,7 +28,7 @@ def gen_bins(lo,hi,n,log=False,symlog=False):
             
     return bin_output
 
-def gen_bins_qcut(data,n,lo=None,hi=None,mbin_size=None):
+def gen_bins_qcut(data,n,lo=None,hi=None,mbin_size=None,quant_log=False):
     bin_output=dict()
     bin_output['edges']=[]
     bin_output['mid']=[]
@@ -52,7 +52,11 @@ def gen_bins_qcut(data,n,lo=None,hi=None,mbin_size=None):
         lo=edge;hi=bin_output['edges'][iedge+1]
         num=np.nansum(np.logical_and(data>lo,data<hi))
         bin_output['mid'].append((lo+hi)/2)
-        bin_output['size_dex'].append(np.log10(hi)-np.log10(lo))
+        if not quant_log:
+            bin_output['size_dex'].append(np.log10(hi)-np.log10(lo))
+        else:
+            bin_output['size_dex'].append(hi-lo)
+
         bin_output['n'].append(num)
     
     for key in list(bin_output.keys()):
@@ -63,8 +67,15 @@ def gen_bins_qcut(data,n,lo=None,hi=None,mbin_size=None):
         bins_good=np.where(bin_output['size_dex']>mbin_size)
         small_lo=bin_output['edges'][bins_too_small[0][0]]
         small_hi=bin_output['edges'][bins_too_small[0][-1]+1]
-        num=np.floor((np.log10(small_hi)-np.log10(small_lo))/mbin_size)
-        new_lowend=10**np.linspace(np.log10(small_lo),np.log10(small_hi),num=num)
+        if not quant_log:
+            num=np.floor((np.log10(small_hi)-np.log10(small_lo))/mbin_size)
+        else:
+            num=np.floor((small_hi-small_lo)/mbin_size)
+        if not quant_log:
+            new_lowend=10**np.linspace(np.log10(small_lo),np.log10(small_hi),num=num)
+        else:
+            new_lowend=np.linspace(small_lo,small_hi,num=num)
+
         new_highend=bin_output['edges'][(bins_too_small[0][-1]+1):]
         bin_output['edges']=np.concatenate([new_lowend[:-1],new_highend])
 
