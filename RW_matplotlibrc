@@ -568,7 +568,7 @@ savefig.dpi         : figure   ## figure dots per inch or 'figure'
 ### pgf parameter
 #pgf.rcfonts : True
 #pgf.preamble :
-#pgf.texsystem : xelatex
+pgf.texsystem : pdflatex
 
 ### docstring params
 ##docstring.hardcopy = False  ## set this when you want to generate hardcopy docstring

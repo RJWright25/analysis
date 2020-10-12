@@ -11,6 +11,7 @@ import matplotlib.colors as mcolors
 import matplotlib.pyplot as plt
 from astropy.stats import bootstrap
 from matplotlib.colors import ListedColormap
+import pandas as pd
 
 def gen_bins(lo,hi,n,log=False,symlog=False):
     bin_output=dict()
@@ -26,6 +27,63 @@ def gen_bins(lo,hi,n,log=False,symlog=False):
             bin_output['edges']=np.array(flatten([-bin_output['edges'][::-1],bin_output['edges']]))
             bin_output['mid']=[bin_output['edges'][i+1]*0.5+bin_output['edges'][i]*0.5 for i in range(len(bin_output['edges'])-1)]
             
+    return bin_output
+
+def gen_bins_qcut(data,n,lo=None,hi=None,mbin_size=None):
+    bin_output=dict()
+    bin_output['edges']=[]
+    bin_output['mid']=[]
+    bin_output['size_dex']=[]
+    bin_output['n']=[]
+
+
+
+    if lo:
+        mask=np.where(np.logical_and(data>lo,data<hi))
+        data=data[mask]
+    else:
+        lo=np.nanmin(data)
+        hi=np.nanmax(data)
+
+    percentiles=np.linspace(0,100,n+1)
+    for percentile in percentiles:
+        bin_output['edges'].append(np.nanpercentile(data,percentile))
+        
+    for iedge,edge in enumerate(bin_output['edges'][:-1]):
+        lo=edge;hi=bin_output['edges'][iedge+1]
+        num=np.nansum(np.logical_and(data>lo,data<hi))
+        bin_output['mid'].append((lo+hi)/2)
+        bin_output['size_dex'].append(np.log10(hi)-np.log10(lo))
+        bin_output['n'].append(num)
+    
+    for key in list(bin_output.keys()):
+        bin_output[key]=np.array(bin_output[key])
+
+    if mbin_size:
+        bins_too_small=np.where(bin_output['size_dex']<mbin_size)
+        bins_good=np.where(bin_output['size_dex']>mbin_size)
+        small_lo=bin_output['edges'][bins_too_small[0][0]]
+        small_hi=bin_output['edges'][bins_too_small[0][-1]+1]
+        num=np.floor((np.log10(small_hi)-np.log10(small_lo))/mbin_size)
+        new_lowend=10**np.linspace(np.log10(small_lo),np.log10(small_hi),num=num)
+        new_highend=bin_output['edges'][(bins_too_small[0][-1]+1):]
+        bin_output['edges']=np.concatenate([new_lowend[:-1],new_highend])
+
+    bin_output['mid']=[]
+    bin_output['size_dex']=[]
+    bin_output['n']=[]
+
+    for iedge,edge in enumerate(bin_output['edges'][:-1]):
+        lo=edge;hi=bin_output['edges'][iedge+1]
+        num=np.nansum(np.logical_and(data>lo,data<hi))
+        bin_output['mid'].append((lo+hi)/2)
+        bin_output['size_dex'].append(np.log10(hi)-np.log10(lo))
+        bin_output['n'].append(num)
+    print(f"Ended up with {len(bin_output['n'])} bins from {n}")
+    
+    for key in list(bin_output.keys()):
+        bin_output[key]=np.array(bin_output[key])
+
     return bin_output
 
 def flatten(list2d):
@@ -380,3 +438,5 @@ def find_excess(x,y,x_edges):
     mean_y_forx=np.array([mean_ys[ix_bin] for ix_bin in x_bin])
     y_normalised=y/(mean_y_forx+1e-10)
     return y_normalised
+
+
