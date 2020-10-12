@@ -11,7 +11,6 @@ import matplotlib.colors as mcolors
 import matplotlib.pyplot as plt
 from astropy.stats import bootstrap
 from matplotlib.colors import ListedColormap
-import pandas as pd
 
 def gen_bins(lo,hi,n,log=False,symlog=False):
     bin_output=dict()
