@@ -309,7 +309,7 @@ def bin_xy(x,y,xy_mask=[],bins=[],bin_range=[],y_lop=16,y_hip=84,bs=0,bin_min=5,
 
     return bin_output
 
-def bin_2dimage(x,y,z,xedges,yedges):
+def bin_2dimage(x,y,z,xedges,yedges,bin_min=5):
     nbins_x=len(xedges)-1
     nbins_y=len(yedges)-1
     nbins=nbins_x*nbins_y
@@ -329,10 +329,11 @@ def bin_2dimage(x,y,z,xedges,yedges):
             ibin_z=z[ibin_mask]
 
             z_count=len(ibin_z);output['Count'][iybin,ixbin]=z_count
-            z_mean=np.nanmean(ibin_z);output['Means'][iybin,ixbin]=z_mean
-            z_median=np.nanmedian(ibin_z);output['Medians'][iybin,ixbin]=z_median
-            z_lop=np.nanpercentile(ibin_z,16);output['Lo_P'][iybin,ixbin]=z_lop
-            z_hip=np.nanpercentile(ibin_z,84);output['Hi_P'][iybin,ixbin]=z_hip
+            if z_count>bin_min:
+                z_mean=np.nanmean(ibin_z);output['Means'][iybin,ixbin]=z_mean
+                z_median=np.nanmedian(ibin_z);output['Medians'][iybin,ixbin]=z_median
+                z_lop=np.nanpercentile(ibin_z,16);output['Lo_P'][iybin,ixbin]=z_lop
+                z_hip=np.nanpercentile(ibin_z,84);output['Hi_P'][iybin,ixbin]=z_hip
 
     return output
 
