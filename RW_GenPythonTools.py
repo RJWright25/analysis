@@ -252,11 +252,10 @@ def bin_xy(x,y,xy_mask=[],bins=[],bin_range=[],y_lop=16,y_hip=84,bs=0,bin_min=5,
         x_subset=np.compress(bin_mask,np.array(x))
         y_subset=np.compress(bin_mask,np.array(y))
 
-
         if bs:
             if ibin==0:
                 print('Doing bootstrap...')
-            if bin_count>5:                    
+            if bin_count>=5:                    
                 sample_results=bootstrap(y_subset,bootnum=bs,samples=int(np.floor(len(y_subset)/2)),bootfunc=np.nanmedian)
                 bs_lo_p=np.nanpercentile(sample_results,16)
                 bs_hi_p=np.nanpercentile(sample_results,84)
