@@ -235,6 +235,7 @@ def bin_xy(x,y,xy_mask=[],bins=[],bin_range=[],y_lop=16,y_hip=84,bs=0,bin_min=5,
     lops_temp=[]
     hips_temp=[]
     yerrs_temp=[]
+    yerrs_bs_temp=[]
 
     finite_mask=np.logical_and(np.isfinite(x),np.isfinite(y))#mask for all points which are notnan
     valid_mask=finite_mask#mask for all points which are both notnan and finite
@@ -262,6 +263,8 @@ def bin_xy(x,y,xy_mask=[],bins=[],bin_range=[],y_lop=16,y_hip=84,bs=0,bin_min=5,
                 bin_output['bs_Lo_P_Median'][ibin]=bs_lo_p
                 bin_output['bs_Hi_P_Median'][ibin]=bs_hi_p
             else:
+                bs_lo_p=np.nan
+                bs_hi_p=np.nan
                 bin_output['bs_Lo_P_Median'][ibin]=np.nan
                 bin_output['bs_Hi_P_Median'][ibin]=np.nan
 
@@ -273,6 +276,7 @@ def bin_xy(x,y,xy_mask=[],bins=[],bin_range=[],y_lop=16,y_hip=84,bs=0,bin_min=5,
         lop_temp=np.nanpercentile(y_subset,y_lop)#calculate lower percentile
         hip_temp=np.nanpercentile(y_subset,y_hip)#calculate upper percentile
         yerr_temp=[median_temp-lop_temp,hip_temp-median_temp]#yerr for errbar
+        yerr_bs_temp=[median_temp-bs_lo_p,bs_hi_p-median_temp]        
 
         bin_counts_temp.append(bin_count)
         bin_invalids_temp.append(bin_count_gross-bin_count)
@@ -285,6 +289,7 @@ def bin_xy(x,y,xy_mask=[],bins=[],bin_range=[],y_lop=16,y_hip=84,bs=0,bin_min=5,
             lops_temp.append(lop_temp)
             hips_temp.append(hip_temp)        
             yerrs_temp.append(yerr_temp)        
+            yerrs_bs_temp.append(yerr_temp)        
         else:
             xmeans_temp.append(np.nan)
             xmedians_temp.append(np.nan)
@@ -293,6 +298,7 @@ def bin_xy(x,y,xy_mask=[],bins=[],bin_range=[],y_lop=16,y_hip=84,bs=0,bin_min=5,
             lops_temp.append(np.nan)
             hips_temp.append(np.nan)
             yerrs_temp.append([np.nan,np.nan])
+            yerrs_bs_temp.append([np.nan,np.nan])
             if verbose:
                 print("Insufficient count in bin at x = ",ibin_mid)
 
@@ -305,6 +311,7 @@ def bin_xy(x,y,xy_mask=[],bins=[],bin_range=[],y_lop=16,y_hip=84,bs=0,bin_min=5,
     bin_output['Lo_P']=np.array(lops_temp)
     bin_output['Hi_P']=np.array(hips_temp)
     bin_output['yerr']=np.transpose(np.array(yerrs_temp))
+    bin_output['yerr_bs']=np.transpose(np.array(yerrs_temp))
 
     return bin_output
 
