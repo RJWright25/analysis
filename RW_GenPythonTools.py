@@ -275,7 +275,6 @@ def bin_xy(x,y,xy_mask=[],bins=[],bin_range=[],y_lop=16,y_hip=84,bs=0,bin_min=5,
             lops_temp.append(lop_temp)
             hips_temp.append(hip_temp)        
             yerrs_temp.append(yerr_temp)        
-            yerrs_bs_temp.append(yerr_temp)        
         else:
             xmeans_temp.append(np.nan)
             xmedians_temp.append(np.nan)
