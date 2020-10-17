@@ -253,20 +253,7 @@ def bin_xy(x,y,xy_mask=[],bins=[],bin_range=[],y_lop=16,y_hip=84,bs=0,bin_min=5,
         x_subset=np.compress(bin_mask,np.array(x))
         y_subset=np.compress(bin_mask,np.array(y))
 
-        if bs:
-            if ibin==0:
-                print('Doing bootstrap...')
-            if bin_count>=5:                    
-                sample_results=bootstrap(y_subset,bootnum=bs,samples=int(np.floor(len(y_subset)/2)),bootfunc=np.nanmedian)
-                bs_lo_p=np.nanpercentile(sample_results,16)
-                bs_hi_p=np.nanpercentile(sample_results,84)
-                bin_output['bs_Lo_P_Median'][ibin]=bs_lo_p
-                bin_output['bs_Hi_P_Median'][ibin]=bs_hi_p
-            else:
-                bs_lo_p=np.nan
-                bs_hi_p=np.nan
-                bin_output['bs_Lo_P_Median'][ibin]=np.nan
-                bin_output['bs_Hi_P_Median'][ibin]=np.nan
+        
 
         xmean_temp=np.nanmean(x_subset)
         xmedian_temp=np.nanmedian(x_subset)
@@ -276,7 +263,6 @@ def bin_xy(x,y,xy_mask=[],bins=[],bin_range=[],y_lop=16,y_hip=84,bs=0,bin_min=5,
         lop_temp=np.nanpercentile(y_subset,y_lop)#calculate lower percentile
         hip_temp=np.nanpercentile(y_subset,y_hip)#calculate upper percentile
         yerr_temp=[median_temp-lop_temp,hip_temp-median_temp]#yerr for errbar
-        yerr_bs_temp=[median_temp-bs_lo_p,bs_hi_p-median_temp]        
 
         bin_counts_temp.append(bin_count)
         bin_invalids_temp.append(bin_count_gross-bin_count)
@@ -298,9 +284,27 @@ def bin_xy(x,y,xy_mask=[],bins=[],bin_range=[],y_lop=16,y_hip=84,bs=0,bin_min=5,
             lops_temp.append(np.nan)
             hips_temp.append(np.nan)
             yerrs_temp.append([np.nan,np.nan])
-            yerrs_bs_temp.append([np.nan,np.nan])
             if verbose:
                 print("Insufficient count in bin at x = ",ibin_mid)
+        
+        if bs:
+            if ibin==0:
+                print('Doing bootstrap...')
+            if bin_count>=5:                    
+                sample_results=bootstrap(y_subset,bootnum=bs,samples=int(np.floor(len(y_subset)/2)),bootfunc=np.nanmedian)
+                bs_lo_p=np.nanpercentile(sample_results,16)
+                bs_hi_p=np.nanpercentile(sample_results,84)
+                bin_output['bs_Lo_P_Median'][ibin]=bs_lo_p
+                bin_output['bs_Hi_P_Median'][ibin]=bs_hi_p
+                yerr_bs_temp=[median_temp-bs_lo_p,bs_hi_p-median_temp]        
+            else:
+                bs_lo_p=np.nan
+                bs_hi_p=np.nan
+                bin_output['bs_Lo_P_Median'][ibin]=np.nan
+                bin_output['bs_Hi_P_Median'][ibin]=np.nan
+                yerr_bs_temp=[np.nan,np.nan] 
+            yerrs_bs_temp.append(yerr_bs_temp)
+
 
     bin_output['Counts']=np.array(bin_counts_temp)
     bin_output['Invalids']=np.array(bin_invalids_temp)
@@ -311,7 +315,8 @@ def bin_xy(x,y,xy_mask=[],bins=[],bin_range=[],y_lop=16,y_hip=84,bs=0,bin_min=5,
     bin_output['Lo_P']=np.array(lops_temp)
     bin_output['Hi_P']=np.array(hips_temp)
     bin_output['yerr']=np.transpose(np.array(yerrs_temp))
-    bin_output['yerr_bs']=np.transpose(np.array(yerrs_temp))
+    if bs:
+        bin_output['yerr_bs']=np.transpose(np.array(yerrs_bs_temp))
 
     return bin_output
 
