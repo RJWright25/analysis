@@ -222,9 +222,16 @@ def bin_xy(x,y,xy_mask=[],bins=[],bin_range=[],y_lop=16,y_hip=84,bs=0,bin_min=5,
             print('Number of bins given = ',bin_no)
 
 
+    def lop_func(x):
+        result=np.nanpercentile(x,16)
+        return result
+    def hip_func(x):
+        result=np.nanpercentile(x,84)
+        return result
+
     #initialise outputs
     bin_init=np.zeros(bin_no)
-    bin_output={'bin_mid':bin_mid,'bin_edges':bin_edges,'bin_means':np.zeros(bin_no),'bin_medians':np.zeros(bin_no),'Counts':np.zeros(bin_no),'Invalids':np.zeros(bin_no),'Means':np.zeros(bin_no),'Medians':np.zeros(bin_no),'Lo_P':np.zeros(bin_no),'Hi_P':np.zeros(bin_no),'bs_Lo_P_Median':np.zeros(bin_no)+np.nan,'bs_Hi_P_Median':np.zeros(bin_no)+np.nan}
+    bin_output={'bin_mid':bin_mid,'bin_edges':bin_edges,'bin_means':np.zeros(bin_no),'bin_medians':np.zeros(bin_no),'Counts':np.zeros(bin_no),'Invalids':np.zeros(bin_no),'Means':np.zeros(bin_no),'Medians':np.zeros(bin_no),'Lo_P':np.zeros(bin_no),'Hi_P':np.zeros(bin_no),'bs_Lo_P_Median':np.zeros(bin_no)+np.nan,'bs_Hi_P_Median':np.zeros(bin_no)+np.nan,'bs_Lo_P_Lo_P':np.zeros(bin_no)+np.nan,'bs_Lo_P_Hi_P':np.zeros(bin_no)+np.nan,'bs_Hi_P_Lo_P':np.zeros(bin_no)+np.nan,'bs_Hi_P_Hi_P':np.zeros(bin_no)+np.nan}
 
     bin_counts_temp=[]
     bin_invalids_temp=[]
@@ -289,19 +296,23 @@ def bin_xy(x,y,xy_mask=[],bins=[],bin_range=[],y_lop=16,y_hip=84,bs=0,bin_min=5,
         if bs:
             if ibin==0:
                 print('Doing bootstrap...')
-            if bin_count>=5:                    
+            if bin_count>=bin_min:      
+            
                 sample_results=bootstrap(y_subset,bootnum=bs,samples=int(np.floor(len(y_subset)/2)),bootfunc=np.nanmedian)
                 bs_lo_p=np.nanpercentile(sample_results,16)
                 bs_hi_p=np.nanpercentile(sample_results,84)
                 bin_output['bs_Lo_P_Median'][ibin]=bs_lo_p
                 bin_output['bs_Hi_P_Median'][ibin]=bs_hi_p
+
+                bin_output['bs_Lo_P_Lo_P'][ibin]=np.nanpercentile(bootstrap(y_subset,bootnum=bs,samples=int(np.floor(len(y_subset)/2)),bootfunc=lop_func),16)
+                bin_output['bs_Lo_P_Hi_P'][ibin]=np.nanpercentile(bootstrap(y_subset,bootnum=bs,samples=int(np.floor(len(y_subset)/2)),bootfunc=lop_func),84)
+                bin_output['bs_Hi_P_Lo_P'][ibin]=np.nanpercentile(bootstrap(y_subset,bootnum=bs,samples=int(np.floor(len(y_subset)/2)),bootfunc=hip_func),16)
+                bin_output['bs_Hi_P_Hi_P'][ibin]=np.nanpercentile(bootstrap(y_subset,bootnum=bs,samples=int(np.floor(len(y_subset)/2)),bootfunc=hip_func),84)
+                
                 yerr_bs_temp=[median_temp-bs_lo_p,bs_hi_p-median_temp]        
             else:
-                bs_lo_p=np.nan
-                bs_hi_p=np.nan
-                bin_output['bs_Lo_P_Median'][ibin]=np.nan
-                bin_output['bs_Hi_P_Median'][ibin]=np.nan
                 yerr_bs_temp=[np.nan,np.nan] 
+
             yerrs_bs_temp.append(yerr_bs_temp)
 
 
@@ -323,7 +334,7 @@ def bin_2dimage(x,y,z,xedges,yedges,bin_min=5):
     nbins_x=len(xedges)-1
     nbins_y=len(yedges)-1
     nbins=nbins_x*nbins_y
-    output={'Means':np.zeros((nbins_y,nbins_x)),'Medians':np.zeros((nbins_y,nbins_x)),'Lo_P':np.zeros((nbins_y,nbins_x)),'Hi_P':np.zeros((nbins_y,nbins_x)),'Count':np.zeros((nbins_y,nbins_x))}
+    output={'Means':np.zeros((nbins_y,nbins_x))+np.nan,'Medians':np.zeros((nbins_y,nbins_x))+np.nan,'Lo_P':np.zeros((nbins_y,nbins_x))+np.nan,'Hi_P':np.zeros((nbins_y,nbins_x))+np.nan,'Count':np.zeros((nbins_y,nbins_x))}
     for ixbin in range(nbins_x):
         xlo=xedges[ixbin]
         xhi=xedges[ixbin+1]
