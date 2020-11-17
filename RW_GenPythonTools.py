@@ -231,7 +231,7 @@ def bin_xy(x,y,xy_mask=[],bins=[],bin_range=[],y_lop=16,y_hip=84,bs=0,bin_min=5,
 
     #initialise outputs
     bin_init=np.zeros(bin_no)
-    bin_output={'bin_mid':bin_mid,'bin_edges':bin_edges,'bin_means':np.zeros(bin_no),'bin_medians':np.zeros(bin_no),'Counts':np.zeros(bin_no),'Invalids':np.zeros(bin_no),'Means':np.zeros(bin_no),'Medians':np.zeros(bin_no),'Lo_P':np.zeros(bin_no),'Hi_P':np.zeros(bin_no),'bs_Lo_P_Median':np.zeros(bin_no)+np.nan,'bs_Hi_P_Median':np.zeros(bin_no)+np.nan,'bs_Lo_P_Lo_P':np.zeros(bin_no)+np.nan,'bs_Lo_P_Hi_P':np.zeros(bin_no)+np.nan,'bs_Hi_P_Lo_P':np.zeros(bin_no)+np.nan,'bs_Hi_P_Hi_P':np.zeros(bin_no)+np.nan}
+    bin_output={'bin_mid':bin_mid,'bin_edges':bin_edges,'bin_means':np.zeros(bin_no),'bin_medians':np.zeros(bin_no),'Counts':np.zeros(bin_no),'Invalids':np.zeros(bin_no),'Means':np.zeros(bin_no),'Medians':np.zeros(bin_no),'Lo_P':np.zeros(bin_no),'Hi_P':np.zeros(bin_no),'Sigma':np.zeros(bin_no),'bs_Lo_P_Median':np.zeros(bin_no)+np.nan,'bs_Hi_P_Median':np.zeros(bin_no)+np.nan,'bs_Lo_P_Lo_P':np.zeros(bin_no)+np.nan,'bs_Lo_P_Hi_P':np.zeros(bin_no)+np.nan,'bs_Hi_P_Lo_P':np.zeros(bin_no)+np.nan,'bs_Hi_P_Hi_P':np.zeros(bin_no)+np.nan,'bs_Sigma_Sigma':np.zeros(bin_no)+np.nan,'bs_Sigma_Lo_P':np.zeros(bin_no)+np.nan,'bs_Sigma_Hi_P':np.zeros(bin_no)+np.nan}
 
     bin_counts_temp=[]
     bin_invalids_temp=[]
@@ -239,6 +239,7 @@ def bin_xy(x,y,xy_mask=[],bins=[],bin_range=[],y_lop=16,y_hip=84,bs=0,bin_min=5,
     xmedians_temp=[]
     means_temp=[]
     medians_temp=[]
+    sigmas_temp=[]
     lops_temp=[]
     hips_temp=[]
     yerrs_temp=[]
@@ -260,13 +261,12 @@ def bin_xy(x,y,xy_mask=[],bins=[],bin_range=[],y_lop=16,y_hip=84,bs=0,bin_min=5,
         x_subset=np.compress(bin_mask,np.array(x))
         y_subset=np.compress(bin_mask,np.array(y))
 
-        
-
         xmean_temp=np.nanmean(x_subset)
         xmedian_temp=np.nanmedian(x_subset)
 
         mean_temp=np.nanmean(y_subset)#calculate mean
         median_temp=np.nanmedian(y_subset)#calculate median
+        sigma_temp=np.nanstd(y_subset)
         lop_temp=np.nanpercentile(y_subset,y_lop)#calculate lower percentile
         hip_temp=np.nanpercentile(y_subset,y_hip)#calculate upper percentile
         yerr_temp=[median_temp-lop_temp,hip_temp-median_temp]#yerr for errbar
@@ -279,6 +279,7 @@ def bin_xy(x,y,xy_mask=[],bins=[],bin_range=[],y_lop=16,y_hip=84,bs=0,bin_min=5,
             xmedians_temp.append(xmedian_temp)
             means_temp.append(mean_temp)
             medians_temp.append(median_temp)
+            sigmas_temp.append(sigma_temp)
             lops_temp.append(lop_temp)
             hips_temp.append(hip_temp)        
             yerrs_temp.append(yerr_temp)        
@@ -287,6 +288,7 @@ def bin_xy(x,y,xy_mask=[],bins=[],bin_range=[],y_lop=16,y_hip=84,bs=0,bin_min=5,
             xmedians_temp.append(np.nan)
             means_temp.append(np.nan)
             medians_temp.append(np.nan)
+            sigmas_temp.append(np.nan)
             lops_temp.append(np.nan)
             hips_temp.append(np.nan)
             yerrs_temp.append([np.nan,np.nan])
@@ -304,11 +306,15 @@ def bin_xy(x,y,xy_mask=[],bins=[],bin_range=[],y_lop=16,y_hip=84,bs=0,bin_min=5,
                 bin_output['bs_Lo_P_Median'][ibin]=bs_lo_p
                 bin_output['bs_Hi_P_Median'][ibin]=bs_hi_p
 
-                bin_output['bs_Lo_P_Lo_P'][ibin]=np.nanpercentile(bootstrap(y_subset,bootnum=bs,samples=int(np.floor(len(y_subset)/2)),bootfunc=lop_func),16)
-                bin_output['bs_Lo_P_Hi_P'][ibin]=np.nanpercentile(bootstrap(y_subset,bootnum=bs,samples=int(np.floor(len(y_subset)/2)),bootfunc=lop_func),84)
-                bin_output['bs_Hi_P_Lo_P'][ibin]=np.nanpercentile(bootstrap(y_subset,bootnum=bs,samples=int(np.floor(len(y_subset)/2)),bootfunc=hip_func),16)
-                bin_output['bs_Hi_P_Hi_P'][ibin]=np.nanpercentile(bootstrap(y_subset,bootnum=bs,samples=int(np.floor(len(y_subset)/2)),bootfunc=hip_func),84)
-                
+                bin_output['bs_Lo_P_Lo_P'][ibin]=np.nanpercentile(bootstrap(y_subset,bootnum=bs,samples=int(np.floor(len(y_subset)/2)),bootfunc=lop_func),2.5)
+                bin_output['bs_Lo_P_Hi_P'][ibin]=np.nanpercentile(bootstrap(y_subset,bootnum=bs,samples=int(np.floor(len(y_subset)/2)),bootfunc=lop_func),97.5)
+                bin_output['bs_Hi_P_Lo_P'][ibin]=np.nanpercentile(bootstrap(y_subset,bootnum=bs,samples=int(np.floor(len(y_subset)/2)),bootfunc=hip_func),2.5)
+                bin_output['bs_Hi_P_Hi_P'][ibin]=np.nanpercentile(bootstrap(y_subset,bootnum=bs,samples=int(np.floor(len(y_subset)/2)),bootfunc=hip_func),97.5)
+
+                bin_output['bs_Sigma_Sigma'][ibin]=np.nanstd(bootstrap(y_subset,bootnum=bs,samples=int(np.floor(len(y_subset)/2)),bootfunc=np.nanstd))
+                bin_output['bs_Sigma_Lo_P'][ibin]=np.nanpercentile(bootstrap(y_subset,bootnum=bs,samples=int(np.floor(len(y_subset)/2)),bootfunc=np.nanstd),16)
+                bin_output['bs_Sigma_Hi_P'][ibin]=np.nanpercentile(bootstrap(y_subset,bootnum=bs,samples=int(np.floor(len(y_subset)/2)),bootfunc=np.nanstd),84)
+
                 yerr_bs_temp=[median_temp-bs_lo_p,bs_hi_p-median_temp]        
             else:
                 yerr_bs_temp=[np.nan,np.nan] 
@@ -322,6 +328,7 @@ def bin_xy(x,y,xy_mask=[],bins=[],bin_range=[],y_lop=16,y_hip=84,bs=0,bin_min=5,
     bin_output['bin_medians']=np.array(xmedians_temp)
     bin_output['Means']=np.array(means_temp)
     bin_output['Medians']=np.array(medians_temp)
+    bin_output['Sigma']=np.array(sigmas_temp)
     bin_output['Lo_P']=np.array(lops_temp)
     bin_output['Hi_P']=np.array(hips_temp)
     bin_output['yerr']=np.transpose(np.array(yerrs_temp))
