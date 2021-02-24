@@ -154,7 +154,7 @@ lines.linewidth   : 1   ## line width in points
 ## The font.size property is the default font size for text, given in pts.
 ## 10 pt is the standard value.
 
-#font.family         : serif
+#font.family         : Times
 #font.style          : normal
 #font.variant        : normal
 #font.weight         : normal
@@ -165,7 +165,7 @@ font.stretch        : extra-condensed
 ## relative to font.size, using the following values: xx-small, x-small,
 ## small, medium, large, x-large, xx-large, larger, or smaller
 font.size           : 10
-font.serif     : Times
+#font.serif     : Times
 #font.sans-serif     : DejaVu Sans, Bitstream Vera Sans, Computer Modern Sans Serif, Lucida Grande, Verdana, Geneva, Lucid, Arial, Helvetica, Avant Garde, sans-serif
 #font.cursive        : Apple Chancery, Textile, Zapf Chancery, Sand, Script MT, Felipa, cursive
 #font.fantasy        : Comic Sans MS, Chicago, Charcoal, ImpactWestern, Humor Sans, xkcd, fantasy
