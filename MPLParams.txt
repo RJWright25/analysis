@@ -1,4 +1,9 @@
-#### MATPLOTLIBRC FORMAT CONFIGURATION
+#### RUBY WRIGHT, 2021 ####
+
+## matplotlib rcparams
+## to use - plt.style.use('https://raw.githubusercontent.com/RJWright25/analysis/master/MPLParams.txt')
+
+### CONFIG STARTS HERE
 
 ## The default backend. If you omit this parameter, the first
 ## working backend from the following list is used:
