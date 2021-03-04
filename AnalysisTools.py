@@ -101,7 +101,6 @@ def bin_xy(x,y,bins=None,bs=0,bin_min=5):
 
 
     valid_mask=np.isfinite(y)
-    print(np.sum(valid_mask))
     for ibin in list(range(len(bin_mid))):#loop through each bin
         
         bin_lo=bin_edges[ibin]#lower bin value
@@ -109,11 +108,9 @@ def bin_xy(x,y,bins=None,bs=0,bin_min=5):
         
         bin_mask=np.logical_and.reduce([x>bin_lo,x<bin_hi,valid_mask])
         bin_output['Counts'][ibin]=np.nansum(bin_mask)
-        print(bin_output['Counts'][ibin])
         bin_output['Invalids'][ibin]=np.nansum(np.logical_and(x>bin_lo,x<bin_hi))-bin_output['Counts'][ibin]
 
         if bin_output['Counts'][ibin]>bin_min:
-            print('valid bin')
             x_subset=np.compress(bin_mask,np.array(x))
             y_subset=np.compress(bin_mask,np.array(y))
 
