@@ -97,8 +97,8 @@ def bin_xy(x,y,bins=None,bs=0,bin_min=5):
                 'bs_Hi_P_Mean':np.zeros(bin_no)+np.nan, #95% CI
                 'yerr-median':np.zeros((2,bin_no))+np.nan,
                 'yerr-mean':np.zeros((2,bin_no))+np.nan,
-                'bs_Sigma_Lo_P':np.zeros(bin_no)+np.nan, #95% CI
-                'bs_Sigma_Hi_P':np.zeros(bin_no)+np.nan, #95% CI
+                'bs_Lo_P_Sigma':np.zeros(bin_no)+np.nan, #95% CI
+                'bs_Hi_P_Sigma':np.zeros(bin_no)+np.nan, #95% CI
                 'yerr-sigma':np.zeros((2,bin_no))+np.nan,
                 } 
 
