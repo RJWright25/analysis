@@ -93,7 +93,10 @@ def bin_xy(x,y,bins=None,bs=0,bin_min=5):
                 #the bootstrap outputs
                 'bs_Lo_P_Median':np.zeros(bin_no)+np.nan, #95% CI
                 'bs_Hi_P_Median':np.zeros(bin_no)+np.nan, #95% CI
+                'bs_Lo_P_Mean':np.zeros(bin_no)+np.nan, #95% CI
+                'bs_Hi_P_Mean':np.zeros(bin_no)+np.nan, #95% CI
                 'yerr-median':np.zeros((2,bin_no))+np.nan,
+                'yerr-mean':np.zeros((2,bin_no))+np.nan,
                 'bs_Sigma_Lo_P':np.zeros(bin_no)+np.nan, #95% CI
                 'bs_Sigma_Hi_P':np.zeros(bin_no)+np.nan, #95% CI
                 'yerr-sigma':np.zeros((2,bin_no))+np.nan,
@@ -132,6 +135,12 @@ def bin_xy(x,y,bins=None,bs=0,bin_min=5):
                     bin_output['bs_Hi_P_Median'][ibin]=np.nanpercentile(median_sample,97.5)
                     bin_output['yerr-median'][0,ibin]=bin_output['Medians'][ibin]-bin_output['bs_Lo_P_Median'][ibin]
                     bin_output['yerr-median'][1,ibin]=bin_output['bs_Hi_P_Median'][ibin]-bin_output['Medians'][ibin]
+
+                    mean_sample=bootstrap(y_subset,bootnum=bs,samples=int(np.floor(len(y_subset)/2)),bootfunc=np.nanmean)
+                    bin_output['bs_Lo_P_Mean'][ibin]=np.nanpercentile(mean_sample,2.5)
+                    bin_output['bs_Hi_P_Mean'][ibin]=np.nanpercentile(mean_sample,97.5)
+                    bin_output['yerr-mean'][0,ibin]=bin_output['Means'][ibin]-bin_output['bs_Lo_P_Mean'][ibin]
+                    bin_output['yerr-mean'][1,ibin]=bin_output['bs_Hi_P_Mean'][ibin]-bin_output['Means'][ibin]
 
                     sigma_sample=bootstrap(y_subset,bootnum=bs,samples=int(np.floor(len(y_subset)/2)),bootfunc=np.nanstd)
                     bin_output['bs_Lo_P_Sigma'][ibin]=np.nanpercentile(sigma_sample,2.5)
