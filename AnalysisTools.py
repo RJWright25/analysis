@@ -101,6 +101,7 @@ def bin_xy(x,y,bins=None,bs=0,bin_min=5):
 
 
     valid_mask=np.isfinite(y)
+    print(np.sum(valid_mask))
     for ibin in list(range(len(bin_mid))):#loop through each bin
         
         bin_lo=bin_edges[ibin]#lower bin value
