@@ -131,20 +131,20 @@ def bin_xy(x,y,bins=None,bs=0,bin_min=5):
             
             if bs:                
                     median_sample=bootstrap(y_subset,bootnum=bs,samples=int(np.floor(len(y_subset)/2)),bootfunc=np.nanmedian)
-                    bin_output['bs_Lo_P_Median'][ibin]=np.nanpercentile(median_sample,2.5)
-                    bin_output['bs_Hi_P_Median'][ibin]=np.nanpercentile(median_sample,97.5)
+                    bin_output['bs_Lo_P_Median'][ibin]=np.nanpercentile(median_sample,16)
+                    bin_output['bs_Hi_P_Median'][ibin]=np.nanpercentile(median_sample,84)
                     bin_output['yerr-median'][0,ibin]=bin_output['Medians'][ibin]-bin_output['bs_Lo_P_Median'][ibin]
                     bin_output['yerr-median'][1,ibin]=bin_output['bs_Hi_P_Median'][ibin]-bin_output['Medians'][ibin]
 
                     mean_sample=bootstrap(y_subset,bootnum=bs,samples=int(np.floor(len(y_subset)/2)),bootfunc=np.nanmean)
-                    bin_output['bs_Lo_P_Mean'][ibin]=np.nanpercentile(mean_sample,2.5)
-                    bin_output['bs_Hi_P_Mean'][ibin]=np.nanpercentile(mean_sample,97.5)
+                    bin_output['bs_Lo_P_Mean'][ibin]=np.nanpercentile(mean_sample,16)
+                    bin_output['bs_Hi_P_Mean'][ibin]=np.nanpercentile(mean_sample,84)
                     bin_output['yerr-mean'][0,ibin]=bin_output['Means'][ibin]-bin_output['bs_Lo_P_Mean'][ibin]
                     bin_output['yerr-mean'][1,ibin]=bin_output['bs_Hi_P_Mean'][ibin]-bin_output['Means'][ibin]
 
                     sigma_sample=bootstrap(y_subset,bootnum=bs,samples=int(np.floor(len(y_subset)/2)),bootfunc=np.nanstd)
-                    bin_output['bs_Lo_P_Sigma'][ibin]=np.nanpercentile(sigma_sample,2.5)
-                    bin_output['bs_Hi_P_Sigma'][ibin]=np.nanpercentile(sigma_sample,97.5)
+                    bin_output['bs_Lo_P_Sigma'][ibin]=np.nanpercentile(sigma_sample,16)
+                    bin_output['bs_Hi_P_Sigma'][ibin]=np.nanpercentile(sigma_sample,84)
                     bin_output['yerr-sigma'][0,ibin]=bin_output['Sigma'][ibin]-bin_output['bs_Lo_P_Sigma'][ibin]
                     bin_output['yerr-sigma'][1,ibin]=bin_output['bs_Hi_P_Sigma'][ibin]-bin_output['Sigma'][ibin]
 
