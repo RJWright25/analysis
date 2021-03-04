@@ -111,6 +111,7 @@ def bin_xy(x,y,bins=None,bs=0,bin_min=5):
         bin_output['Invalids'][ibin]=np.nansum(np.logical_and(x>bin_lo,x<bin_hi))-bin_output['Counts'][ibin]
 
         if bin_output['Counts'][ibin]>bin_min:
+            print('valid bin')
             x_subset=np.compress(bin_mask,np.array(x))
             y_subset=np.compress(bin_mask,np.array(y))
 
