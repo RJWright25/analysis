@@ -141,8 +141,8 @@ def bin_xy(x,y,bins=None,bs=0,bin_min=5):
             bin_output['Hi_P-2sigma'][ibin]=np.nanpercentile(y_subset,97.725)
             bin_output['yerr-spread'][0,ibin]=bin_output['Medians'][ibin]-bin_output['Lo_P'][ibin]
             bin_output['yerr-spread'][1,ibin]=bin_output['Hi_P'][ibin]-bin_output['Medians'][ibin]
-            bin_output['yerr-spread-dex'][0,ibin]=np.log10(bin_output['Medians'][ibin]/(bin_output['Lo_P'][ibin]+1e-12))
-            bin_output['yerr-spread-dex'][1,ibin]=np.log10(bin_output['Hi_P'][ibin]/(bin_output['Medians'][ibin]+1e-12))
+            bin_output['yerr-spread-dex'][0,ibin]=np.log10(bin_output['Medians'][ibin]/(bin_output['Lo_P'][ibin]+1e-6))
+            bin_output['yerr-spread-dex'][1,ibin]=np.log10(bin_output['Hi_P'][ibin]/(bin_output['Medians'][ibin]+1e-6))
             bin_output['yerr-spread-2sigma'][0,ibin]=bin_output['Medians'][ibin]-bin_output['Lo_P-2sigma'][ibin]
             bin_output['yerr-spread-2sigma'][1,ibin]=bin_output['Hi_P-2sigma'][ibin]-bin_output['Medians'][ibin]
             if bs:                
