@@ -102,8 +102,10 @@ def bin_xy(x,y,bins=None,bs=0,bin_min=5):
                 'bs_Hi_P_Mean':np.zeros(bin_no)+np.nan, #95% CI
                 'bs_Hi_P_Mean-2sigma':np.zeros(bin_no)+np.nan, #95% CI
                 'yerr-median':np.zeros((2,bin_no))+np.nan,
+                'yerr-median-dex':np.zeros((2,bin_no))+np.nan,
                 'yerr-median-2sigma':np.zeros((2,bin_no))+np.nan,
                 'yerr-mean':np.zeros((2,bin_no))+np.nan,
+                'yerr-mean-dex':np.zeros((2,bin_no))+np.nan,
                 'yerr-mean-2sigma':np.zeros((2,bin_no))+np.nan,
                 'bs_Lo_P_Sigma':np.zeros(bin_no)+np.nan, #95% CI
                 'bs_Lo_P_Sigma-2sigma':np.zeros(bin_no)+np.nan, #95% CI
@@ -139,8 +141,8 @@ def bin_xy(x,y,bins=None,bs=0,bin_min=5):
             bin_output['Hi_P-2sigma'][ibin]=np.nanpercentile(y_subset,97.725)
             bin_output['yerr-spread'][0,ibin]=bin_output['Medians'][ibin]-bin_output['Lo_P'][ibin]
             bin_output['yerr-spread'][1,ibin]=bin_output['Hi_P'][ibin]-bin_output['Medians'][ibin]
-            bin_output['yerr-spread-dex'][0,ibin]=np.log10(bin_output['Hi_P'][ibin]/bin_output['Medians'][ibin])
-            bin_output['yerr-spread-dex'][1,ibin]=np.log10(bin_output['Medians'][ibin]/bin_output['Lo_P'][ibin])
+            bin_output['yerr-spread-dex'][0,ibin]=np.log10(bin_output['Medians'][ibin]/bin_output['Lo_P'][ibin])
+            bin_output['yerr-spread-dex'][1,ibin]=np.log10(bin_output['Hi_P'][ibin]/bin_output['Medians'][ibin])
             bin_output['yerr-spread-2sigma'][0,ibin]=bin_output['Medians'][ibin]-bin_output['Lo_P-2sigma'][ibin]
             bin_output['yerr-spread-2sigma'][1,ibin]=bin_output['Hi_P-2sigma'][ibin]-bin_output['Medians'][ibin]
             if bs:                
@@ -149,6 +151,8 @@ def bin_xy(x,y,bins=None,bs=0,bin_min=5):
                     bin_output['bs_Hi_P_Median'][ibin]=np.nanpercentile(median_sample,84)
                     bin_output['yerr-median'][0,ibin]=bin_output['Medians'][ibin]-bin_output['bs_Lo_P_Median'][ibin]
                     bin_output['yerr-median'][1,ibin]=bin_output['bs_Hi_P_Median'][ibin]-bin_output['Medians'][ibin]
+                    bin_output['yerr-median-dex'][1,ibin]=np.log10(bin_output['bs_Hi_P_Median'][ibin]/bin_output['Medians'][ibin])
+                    bin_output['yerr-median-dex'][0,ibin]=np.log10(bin_output['Medians'][ibin]/bin_output['bs_Lo_P_Median'][ibin])
                     bin_output['bs_Lo_P_Median-2sigma'][ibin]=np.nanpercentile(median_sample,2.275)
                     bin_output['bs_Hi_P_Median-2sigma'][ibin]=np.nanpercentile(median_sample,97.725)
                     bin_output['yerr-median-2sigma'][0,ibin]=bin_output['Medians'][ibin]-bin_output['bs_Lo_P_Median-2sigma'][ibin]
