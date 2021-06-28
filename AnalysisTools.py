@@ -90,6 +90,19 @@ def bin_xy(x,y,bins=None,bs=0,bin_min=5):
                 'yerr-spread-2sigma':np.zeros((2,bin_no))+np.nan,
                 'Lo_P-2sigma':np.zeros(bin_no)+np.nan,
                 'Hi_P-2sigma':np.zeros(bin_no)+np.nan,
+                '2.5p':np.zeros(bin_no)+np.nan,
+                '05p':np.zeros(bin_no)+np.nan,
+                '10p':np.zeros(bin_no)+np.nan,
+                '20p':np.zeros(bin_no)+np.nan,
+                '30p':np.zeros(bin_no)+np.nan,
+                '40p':np.zeros(bin_no)+np.nan,
+                '50p':np.zeros(bin_no)+np.nan,
+                '60p':np.zeros(bin_no)+np.nan,
+                '70p':np.zeros(bin_no)+np.nan,
+                '80p':np.zeros(bin_no)+np.nan,
+                '90p':np.zeros(bin_no)+np.nan,
+                '95p':np.zeros(bin_no)+np.nan,
+                '97.5p':np.zeros(bin_no)+np.nan,
                 'yerr-spread':np.zeros((2,bin_no))+np.nan,
                 'Sigma':np.zeros(bin_no)+np.nan,
                 #the bootstrap outputs
@@ -139,6 +152,19 @@ def bin_xy(x,y,bins=None,bs=0,bin_min=5):
             bin_output['Hi_P'][ibin]=np.nanpercentile(y_subset,84)
             bin_output['Lo_P-2sigma'][ibin]=np.nanpercentile(y_subset,2.275)
             bin_output['Hi_P-2sigma'][ibin]=np.nanpercentile(y_subset,97.725)
+            bin_output['2.5p'][ibin]=np.nanpercentile(y_subset,2.5)
+            bin_output['05p'][ibin]=np.nanpercentile(y_subset,5)
+            bin_output['10p'][ibin]=np.nanpercentile(y_subset,10)
+            bin_output['20p'][ibin]=np.nanpercentile(y_subset,20)
+            bin_output['30p'][ibin]=np.nanpercentile(y_subset,20)
+            bin_output['40p'][ibin]=np.nanpercentile(y_subset,40)
+            bin_output['50p'][ibin]=np.nanpercentile(y_subset,50)
+            bin_output['60p'][ibin]=np.nanpercentile(y_subset,60)
+            bin_output['70p'][ibin]=np.nanpercentile(y_subset,70)
+            bin_output['80p'][ibin]=np.nanpercentile(y_subset,80)
+            bin_output['90p'][ibin]=np.nanpercentile(y_subset,90)
+            bin_output['95p'][ibin]=np.nanpercentile(y_subset,95)
+            bin_output['97.5p'][ibin]=np.nanpercentile(y_subset,97.5)
             bin_output['yerr-spread'][0,ibin]=bin_output['Medians'][ibin]-bin_output['Lo_P'][ibin]
             bin_output['yerr-spread'][1,ibin]=bin_output['Hi_P'][ibin]-bin_output['Medians'][ibin]
             bin_output['yerr-spread-dex'][0,ibin]=np.log10(bin_output['Medians'][ibin]/(bin_output['Lo_P'][ibin]+1e-6))
