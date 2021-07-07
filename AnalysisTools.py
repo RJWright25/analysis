@@ -236,9 +236,11 @@ def bin_2dimage(x,y,z,xedges,yedges,bin_min=5):
 
     return output
 
-def find_excess(x,y,xedges,ylog=False):
+def find_excess(x,y,xedges,xmatch=None,ymatch=None,ylog=False):
     x=np.array(x);y=np.array(y)
-    median_relation=bin_xy(x=x,y=y,bins=xedges)['Medians']
+    if not xmatch and ymatch:
+        xmatch=x;ymatch=y
+    median_relation=bin_xy(x=xmatch,ymatch=y,bins=xedges)['Medians']
     bin_allocation=np.zeros(len(y)).astype(int)-1
     for ix,xval in enumerate(x):
         ix_binallocation=np.where(np.logical_and(xval>xedges[:-1],xval<xedges[1:]))
