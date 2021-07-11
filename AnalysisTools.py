@@ -258,3 +258,60 @@ def find_excess(x,y,xedges,xmatch=False,ymatch=False,ylog=False):
 
 # axes labels to reuse
 axeslabels=dict()
+
+
+def open_pickle(path):
+    """
+
+    open_pickle : function
+	----------------------
+
+    Open a (binary) pickle file at the specified path, close file, return result.
+
+	Parameters
+	----------
+    path : str
+        Path to the desired pickle file. 
+
+
+    Returns
+	----------
+    output : data structure of desired pickled object
+
+    """
+
+    with open(path,'rb') as picklefile:
+        pickledata=pickle.load(picklefile)
+        picklefile.close()
+
+    return pickledata
+
+def dump_pickle(data,path):
+    """
+
+    dump_pickle : function
+	----------------------
+
+    Dump data to a (binary) pickle file at the specified path, close file.
+
+	Parameters
+	----------
+    data : any type
+        The object to pickle. 
+
+    path : str
+        Path to the desired pickle file. 
+
+
+    Returns
+	----------
+    None
+
+    Creates a file containing the pickled object at path. 
+
+    """
+
+    with open(path,'wb') as picklefile:
+        pickle.dump(data,picklefile,protocol=4)
+        picklefile.close()
+    return data
