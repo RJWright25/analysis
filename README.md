@@ -1,1 +1,1 @@
-Python data analysis tools. And a matplotlibrc file. 
+Python data analysis tools, and a matplotlibrc file. 
