@@ -248,7 +248,7 @@ text.usetex         : True  ## use latex for all text handling. The following fo
 ## default face and edge color, default tick sizes,
 ## default fontsizes for ticklabels, and so on.  See
 ## http://matplotlib.org/api/axes_api.html#module-matplotlib.axes
-#axes.facecolor      : white   ## axes background color
+axes.facecolor      : white   ## axes background color
 #axes.edgecolor      : black   ## axes edge color
 axes.linewidth      : 1     ## edge linewidth
 axes.grid           : True   ## display grid or not
@@ -397,7 +397,7 @@ figure.titlesize : 9.5      ## size of the figure title (Figure.suptitle())
 figure.titleweight : normal   ## weight of the figure title
 figure.figsize   : 3.25,3.25   ## figure size in inches
 figure.dpi       : 500 ## figure dots per inch
-#figure.facecolor : white      ## figure facecolor
+figure.facecolor : white      ## figure facecolor
 #figure.edgecolor : white      ## figure edgecolor
 #figure.frameon : True         ## enable figure frame
 #figure.max_open_warning : 20  ## The maximum number of figures to open through
