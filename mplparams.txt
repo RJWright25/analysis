@@ -166,7 +166,7 @@ font.family         : serif
 #font.weight         : normal
 font.stretch        : extra-condensed
 ## note that font.size controls default text sizes.  To configure
-## special text sizes tick labels, axes, labels, title, etc, see the rc
+## special text sizes labels, axes, labels, title, etc, see the rc
 ## settings for axes and ticks. Special text sizes can be defined
 ## relative to font.size, using the following values: xx-small, x-small,
 ## small, medium, large, x-large, xx-large, larger, or smaller
@@ -333,7 +333,7 @@ xtick.bottom         : True   ## draw ticks on the bottom side
 #xtick.major.pad      : 3.5    ## distance to major tick label in points
 #xtick.minor.pad      : 3.4    ## distance to the minor tick label in points
 #xtick.color          : black  ## color of the tick labels
-xtick.labelsize      : 10 ## fontsize of the tick labels
+xtick.labelsize      : 8 ## fontsize of the tick labels
 xtick.direction      : in    ## direction: in, out, or inout
 xtick.minor.visible  : True  ## visibility of minor ticks on x-axis
 #xtick.major.top      : True   ## draw x axis top major ticks
@@ -353,7 +353,7 @@ ytick.right          : True  ## draw ticks on the right side
 #ytick.major.pad      : 3.5    ## distance to major tick label in points
 #ytick.minor.pad      : 3.4    ## distance to the minor tick label in points
 #ytick.color          : black  ## color of the tick labels
-ytick.labelsize      : 10 ## fontsize of the tick labels
+ytick.labelsize      : 8 ## fontsize of the tick labels
 ytick.direction      : in    ## direction: in, out, or inout
 ytick.minor.visible  : True  ## visibility of minor ticks on y-axis
 #ytick.major.left     : True   ## draw y axis left major ticks
