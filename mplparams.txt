@@ -42,7 +42,7 @@
 #### LINES
 ## See http://matplotlib.org/api/artist_api.html#module-matplotlib.lines for more
 ## information on line properties.
-lines.linewidth   : 1   ## line width in points
+lines.linewidth   : 1.5   ## line width in points
 #lines.linestyle   : -       ## solid line
 #lines.color       : C0      ## has no affect on plot(); see axes.prop_cycle
 #lines.marker      : None    ## the default marker
@@ -250,7 +250,7 @@ text.usetex         : True  ## use latex for all text handling. The following fo
 ## http://matplotlib.org/api/axes_api.html#module-matplotlib.axes
 axes.facecolor      : white   ## axes background color
 #axes.edgecolor      : black   ## axes edge color
-axes.linewidth      : 1.25     ## edge linewidth
+axes.linewidth      : 1.5     ## edge linewidth
 axes.grid           : True   ## display grid or not
 axes.grid.axis      : both    ## which axis the grid should apply to
 axes.grid.which     : both   ## gridlines at major, minor or both ticks
