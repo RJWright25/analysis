@@ -3,8 +3,35 @@
 
 # Imports
 import numpy as np
-import pickle
 from astropy.stats import bootstrap
+
+import matplotlib
+from matplotlib.colors import to_rgba
+import colorsys
+import cmasher
+import cmocean
+
+def lighten_color(color, amount=0.5):
+    """
+    Lightens the given color by multiplying (1-luminosity) by the given amount.
+    Input can be matplotlib color string, hex string, or RGB tuple.
+
+    Examples:
+    >> lighten_color('g', 0.3)
+    >> lighten_color('#F034A3', 0.6)
+    >> lighten_color((.3,.55,.1), 0.5)
+    """
+
+    try:
+        c = matplotlib.colors.cnames[color]
+    except:
+        c = color
+    c = colorsys.rgb_to_hls(*matplotlib.colors.to_rgb(c))
+    return colorsys.hls_to_rgb(c[0], 1 - amount * (1 - c[1]), c[2])
+
+
+def adjust_alpha(color,alpha=1):
+    return matplotlib.colors.to_rgba(color,alpha=alpha)
 
 # Generate bins for histograms, binned_statistic etc
 def gen_bins(lo,hi,n=10,log=False):
@@ -306,60 +333,60 @@ def find_excess_2d(x,y,z,xedges,yedges,xmatch=None,ymatch=None,zmatch=None,zlog=
 
     return z_normalised
 
-# Open a pickled binary file
-def open_pickle(path):
-    """
+# # Open a pickled binary file
+# def open_pickle(path):
+#     """
 
-    open_pickle : function
-	----------------------
+#     open_pickle : function
+# 	----------------------
 
-    Open a (binary) pickle file at the specified path, close file, return result.
+#     Open a (binary) pickle file at the specified path, close file, return result.
 
-	Parameters
-	----------
-    path : str
-        Path to the desired pickle file. 
-
-
-    Returns
-	----------
-    output : data structure of desired pickled object
-
-    """
-
-    with open(path,'rb') as picklefile:
-        pickledata=pickle.load(picklefile)
-        picklefile.close()
-
-    return pickledata
-
-# Dump object to a binary file
-def dump_pickle(data,path):
-    """
-
-    dump_pickle : function
-	----------------------
-
-    Dump data to a (binary) pickle file at the specified path, close file.
-
-	Parameters
-	----------
-    data : any type
-        The object to pickle. 
-
-    path : str
-        Path to the desired pickle file. 
+# 	Parameters
+# 	----------
+#     path : str
+#         Path to the desired pickle file. 
 
 
-    Returns
-	----------
-    None
+#     Returns
+# 	----------
+#     output : data structure of desired pickled object
 
-    Creates a file containing the pickled object at path. 
+#     """
 
-    """
+#     with open(path,'rb') as picklefile:
+#         pickledata=pickle.load(picklefile)
+#         picklefile.close()
 
-    with open(path,'wb') as picklefile:
-        pickle.dump(data,picklefile,protocol=4)
-        picklefile.close()
-    return data
+#     return pickledata
+
+# # Dump object to a binary file
+# def dump_pickle(data,path):
+#     """
+
+#     dump_pickle : function
+# 	----------------------
+
+#     Dump data to a (binary) pickle file at the specified path, close file.
+
+# 	Parameters
+# 	----------
+#     data : any type
+#         The object to pickle. 
+
+#     path : str
+#         Path to the desired pickle file. 
+
+
+#     Returns
+# 	----------
+#     None
+
+#     Creates a file containing the pickled object at path. 
+
+#     """
+
+#     with open(path,'wb') as picklefile:
+#         pickle.dump(data,picklefile,protocol=4)
+#         picklefile.close()
+#     return data
