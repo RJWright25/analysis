@@ -266,7 +266,7 @@ font.family:  serif
 #font.stretch: normal
 #font.size:    10.0
 
-font.serif:      Times New Roman, Times, Computer Modern Roman
+#font.serif:      Times New Roman, Times, Computer Modern Roman
 #font.sans-serif: DejaVu Sans, Bitstream Vera Sans, Computer Modern Sans Serif, Lucida Grande, Verdana, Geneva, Lucid, Arial, Helvetica, Avant Garde, sans-serif
 #font.cursive:    Apple Chancery, Textile, Zapf Chancery, Sand, Script MT, Felipa, Comic Neue, Comic Sans MS, cursive
 #font.fantasy:    Chicago, Charcoal, Impact, Western, xkcd script, fantasy
