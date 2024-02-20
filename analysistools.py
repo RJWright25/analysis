@@ -5,60 +5,33 @@
 import numpy as np
 from astropy.stats import bootstrap
 
-import matplotlib
-from matplotlib.colors import to_rgba
-import colorsys
-import cmasher
-import cmocean
-
-def lighten_color(color, amount=0.5):
-    """
-    Lightens the given color by multiplying (1-luminosity) by the given amount.
-    Input can be matplotlib color string, hex string, or RGB tuple.
-
-    Examples:
-    >> lighten_color('g', 0.3)
-    >> lighten_color('#F034A3', 0.6)
-    >> lighten_color((.3,.55,.1), 0.5)
-    """
-
-    try:
-        c = matplotlib.colors.cnames[color]
-    except:
-        c = color
-    c = colorsys.rgb_to_hls(*matplotlib.colors.to_rgb(c))
-    return colorsys.hls_to_rgb(c[0], 1 - amount * (1 - c[1]), c[2])
-
-
-def adjust_alpha(color,alpha=1):
-    return matplotlib.colors.to_rgba(color,alpha=alpha)
-
 # Generate bins for histograms, binned_statistic etc
 def gen_bins(lo,hi,n=10,log=False):
 
     """ 
-        gen_bins : function
-        ----------
-        Generate bins for statistics with specified interval. 
-            
-        Parameters
-        ----------
-        lo : float 
-            lower bound of parameter range
-        hi : float 
-            upper bound of parameter range
-        n : int
-            number of bin midpoints
-        log : bool
-            assume lo and hi are log10 base values, convert to regular space
+    gen_bins : function
+    ----------
+    Generate bins for statistics with specified interval. 
+        
+    Parameters
+    ----------
+    lo : float 
+        lower bound of parameter range
+    hi : float 
+        upper bound of parameter range
+    n : int
+        number of bin midpoints
+    log : bool
+        assume lo and hi are log10 base values, convert to regular space
 
-        Returns
-        -------
-        bin_output : dict
-            Dictionary of bin details:
-            'mid': midpoints of bins (length n)
-            'edges': edges of bins (length n+1)
-            'width': width of each bin (length n)
+    Returns
+    -------
+    bin_output : dict
+
+    Dictionary of bin details:
+    'mid': midpoints of bins (length n)
+    'edges': edges of bins (length n+1)
+    'width': width of each bin (length n)
 
     """
 
@@ -72,6 +45,83 @@ def gen_bins(lo,hi,n=10,log=False):
         bin_output['mid']=10**bin_output['mid']
 
     return bin_output
+
+
+# Histogram with bootstrap-generated confidence intervals on bin counts
+def hist_bootstrap(x,x_edges=None,bs=100):
+    
+    """ 
+    hist_bootstrap : function
+    ----------
+    Calculate histogram with bootstrap-generated confidence intervals on bin counts.
+
+    Parameters
+    ----------
+    x : list or ndarray
+        values to be binned
+    x_edges : list or ndarray
+        edges of bins
+    bs : int
+        number of bootstrap resamples to be conducted
+
+    Returns
+    -------
+    output : dict
+
+    Dictionary of bin details:
+    'x_mid': midpoints of bins (length n)
+    'x_edges': edges of bins (length n+1)
+    'x_width': width of each bin (length n)
+    'Counts': histogram of x values in bins
+    'Counts_PDF': histogram of x values in bins, normalised by bin width
+    'Counts_PDF_lo_1sigma': 16th percentile of bootstrapped histogram
+    'Counts_PDF_hi_1sigma': 84th percentile of bootstrapped histogram
+    'Counts_PDF_50P': 50th percentile of bootstrapped histogram
+    'Counts_PDF_Means': mean of bootstrapped histogram
+    'Counts_PDF_lo_2sigma': 2.5th percentile of bootstrapped histogram
+    'Counts_PDF_hi_2sigma': 97.5th percentile of bootstrapped histogram
+
+
+    """
+
+    x=np.array(x)
+    if not np.any(x_edges):
+        x_edges=gen_bins(np.nanpercentile(x,1),np.nanpercentile(x,99),n=11)
+    x_mid=x_edges[1:]/2+x_edges[:-1]/2
+    x_width=x_edges[1:]-x_edges[:-1]
+
+    #output
+    output={'x_mid':x_mid,'x_edges':x_edges,'x_width':x_width}
+
+    #regular histogram
+    output['Counts']=np.histogram(x,bins=x_edges)[0]
+    output['Counts_PDF']=np.histogram(x,bins=x_edges,density=True)[0]
+
+    #select random samples from x
+    x_samples=np.row_stack([np.random.choice(x,size=int(len(x)/2),replace=False) for ibs in range(bs)])
+
+    #calculate histogram for each sample
+    x_samples_hist_density=np.zeros((bs,len(x_mid)))
+
+    for i in range(bs):
+        x_samples_hist_density[i]=np.histogram(x_samples[i],bins=x_edges,density=True)[0]
+    
+    #calculate percentiles of histogram
+    #1st percentile of histogram
+    p2p5=np.percentile(x_samples_hist_density,2.5,axis=0)
+    p16=np.percentile(x_samples_hist_density,16,axis=0)
+    p84=np.percentile(x_samples_hist_density,84,axis=0)
+    p97p5=np.percentile(x_samples_hist_density,97.5,axis=0)
+
+
+    output['Counts_PDF_lo_1sigma']=p16
+    output['Counts_PDF_hi_1sigma']=p84
+    output['Counts_PDF_50P']=np.percentile(x_samples_hist_density,50,axis=0)
+    output['Counts_PDF_Means']=np.mean(x_samples_hist_density,axis=0)
+    output['Counts_PDF_lo_2sigma']=p2p5
+    output['Counts_PDF_hi_2sigma']=p97p5
+
+    return output
 
 # Calculate binned statistic for 2D data with specified bins
 def bin_2d(x,y,bins=None,pciles=None,bin_min=5,bs=0):
@@ -274,7 +324,7 @@ def bin_3d(x,y,z,xedges,yedges,bin_min=5):
             
             output['Count'][iybin,ixbin]=z_count
             if z_count>bin_min:
-                output['Means'][iybin,ixbin]=np.nanmean(ibin_z)
+                output['Means'][iybin,ixbin]=np.nansum(ibin_z)/len(ibin_z)
                 output['Medians'][iybin,ixbin]=np.nanmedian(ibin_z)
                 output['Lo_P'][iybin,ixbin]=np.nanpercentile(ibin_z,16)
                 output['Hi_P'][iybin,ixbin]=np.nanpercentile(ibin_z,84)
@@ -283,6 +333,29 @@ def bin_3d(x,y,z,xedges,yedges,bin_min=5):
 
 # Calculate excess value of parameter relative to control set in 2d 
 def find_excess(x,y,xedges,prop='Medians',xmatch=False,ymatch=False,ylog=False):
+
+    """
+    find_excess : function
+    ----------------------
+    Calculate excess value of parameter relative to control set in 2d.
+
+    Parameters
+	----------
+    x: x values of data
+    y: y values of data
+    xedges: edges of x bins
+    prop: which statistic to use for excess calculation
+    xmatch: x values of control set
+    ymatch: y values of control set
+    ylog: if True, calculate log10(y) excess
+
+    Returns
+    ----------
+    y_normalised : ndarray
+        Normalised y values
+ 
+    """
+
     x=np.array(x);y=np.array(y)
     if not np.sum(np.logical_and(xmatch,ymatch)):
         xmatch=x;ymatch=y
@@ -304,6 +377,38 @@ def find_excess(x,y,xedges,prop='Medians',xmatch=False,ymatch=False,ylog=False):
 
 # Calculate excess value of parameter relative to control set in 3d 
 def find_excess_2d(x,y,z,xedges,yedges,xmatch=None,ymatch=None,zmatch=None,zlog=False,use='Medians'):
+
+    """
+    find_excess_2d : function
+    ----------------------
+    Calculate excess value of parameter relative to control set in 3d.
+
+    Parameters
+    ----------
+    x: x values of data
+    y: y values of data
+    z: z values of data
+    xedges: edges of x bins
+    yedges: edges of y bins
+    xmatch: x values of control set
+    ymatch: y values of control set
+    zmatch: z values of control set
+    zlog: if True, calculate log10(z) excess
+    use: which statistic to use for excess calculation
+    
+    Returns
+    ----------
+    z_normalised : ndarray
+        Normalised z values
+
+    """
+
+
+    x=np.array(x);y=np.array(y);z=np.array(z)
+    if not np.sum(np.logical_and(xmatch,ymatch,zmatch)):
+        xmatch=x;ymatch=y;zmatch=z
+
+
 
     if not np.sum(zmatch):
         xmatch=x
@@ -332,6 +437,44 @@ def find_excess_2d(x,y,z,xedges,yedges,xmatch=None,ymatch=None,zmatch=None,zlog=
         z_normalised=z-matched_medians
 
     return z_normalised
+
+
+
+
+#### PLOTTING TOOLS ####
+import matplotlib
+from matplotlib.colors import to_rgba
+import colorsys
+import cmasher
+import cmocean
+
+def lighten_color(color, fac=10):
+    """
+    lighten_color : function
+    ----------------------
+    Lightens the given color by multiplying (1-luminosity) by the given amount.
+    Input can be matplotlib color string, hex string, or RGB tuple.
+    """
+
+    try:
+        c = matplotlib.colors.cnames[color]
+    except:
+        c = color
+    c = colorsys.rgb_to_hls(*matplotlib.colors.to_rgb(c))
+    return colorsys.hls_to_rgb(c[0], fac*c[1], c[2])
+
+
+def adjust_alpha(color,alpha=1):
+    """ 
+    adjust_alpha : function
+    ----------------------
+    Adjust the alpha value of a color.
+
+    """
+    return matplotlib.colors.to_rgba(color,alpha=alpha)
+
+
+
 
 # # Open a pickled binary file
 # def open_pickle(path):

@@ -10,7 +10,7 @@
 ## working backend from the following list is used:
 ## MacOSX Qt5Agg Qt4Agg Gtk3Agg GTK3Cairo TkAgg WxAgg Agg Cairo
 
-#backend      : Agg
+#backend      : MacOSX
 
 ## The port to use for the web server in the WebAgg backend.
 #webagg.port : 8988
@@ -165,11 +165,13 @@ font.family         : serif
 #font.variant        : normal
 #font.weight         : normal
 font.stretch        : extra-condensed
+
 ## note that font.size controls default text sizes.  To configure
 ## special text sizes labels, axes, labels, title, etc, see the rc
 ## settings for axes and ticks. Special text sizes can be defined
 ## relative to font.size, using the following values: xx-small, x-small,
 ## small, medium, large, x-large, xx-large, larger, or smaller
+
 font.size           : 8
 font.serif     : Times
 #font.sans-serif     : DejaVu Sans, Bitstream Vera Sans, Computer Modern Sans Serif, Lucida Grande, Verdana, Geneva, Lucid, Arial, Helvetica, Avant Garde, sans-serif
@@ -184,7 +186,7 @@ font.serif     : Times
 #text.color          : black
 
 #### LaTeX customizations. See http://wiki.scipy.org/Cookbook/Matplotlib/UsingTex
-text.usetex         : True  ## use latex for all text handling. The following fonts
+text.usetex         : False  ## use latex for all text handling. The following fonts
                               ## are supported through the usual rc parameter settings:
                               ## new century schoolbook, bookman, times, palatino,
                               ## zapf chancery, charter, serif, sans-serif, helvetica,
@@ -233,13 +235,13 @@ text.usetex         : True  ## use latex for all text handling. The following fo
 #mathtext.it  : sans:italic
 #mathtext.bf  : sans:bold
 #mathtext.sf  : sans
-#mathtext.fontset : dejavusans ## Should be 'dejavusans' (default),
+mathtext.fontset : stix ## Should be 'dejavusans' (default),
                                ## 'dejavuserif', 'cm' (Computer Modern), 'stix',
                                ## 'stixsans' or 'custom'
-#mathtext.fallback_to_cm : True  ## When True, use symbols from the Computer Modern
+mathtext.fallback : cm  ## When True, use symbols from the Computer Modern
                                  ## fonts when a symbol can not be found in one of
                                  ## the custom math fonts.
-#mathtext.default : it ## The default font to use for math.
+mathtext.default : it ## The default font to use for math.
                        ## Can be any of the LaTeX font names, including
                        ## the special name "regular" for the same font
                        ## used in regular text.
@@ -249,19 +251,19 @@ text.usetex         : True  ## use latex for all text handling. The following fo
 ## default fontsizes for ticklabels, and so on.  See
 ## http://matplotlib.org/api/axes_api.html#module-matplotlib.axes
 axes.facecolor      : white   ## axes background color
-#axes.edgecolor      : black   ## axes edge color
+axes.edgecolor      : black   ## axes edge color
 axes.linewidth      : 1.5     ## edge linewidth
 axes.grid           : True   ## display grid or not
 axes.grid.axis      : both    ## which axis the grid should apply to
 axes.grid.which     : both   ## gridlines at major, minor or both ticks
 axes.titlesize      : 8.5   ## fontsize of the axes title
-#axes.titleweight    : normal  ## font weight of title
+axes.titleweight    : normal  ## font weight of title
 axes.titlepad       : 4.0     ## pad between axes and title in points
 axes.labelsize      : 9  ## fontsize of the x any y labels
 axes.labelpad       : 2.0     ## space between label and axis
-#axes.labelweight    : normal  ## weight of the x and y labels
-#axes.labelcolor     : black
-#axes.axisbelow      : line    ## draw axis gridlines and ticks below
+axes.labelweight    : normal  ## weight of the x and y labels
+axes.labelcolor     : black
+axes.axisbelow      : line    ## draw axis gridlines and ticks below
                                ## patches (True); above patches but below
                                ## lines ('line'); or above all (False)
 #axes.formatter.limits : -7, 7 ## use scientific notation if log10
