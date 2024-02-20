@@ -173,7 +173,7 @@ font.stretch        : extra-condensed
 ## small, medium, large, x-large, xx-large, larger, or smaller
 
 font.size           : 8
-font.serif     : Times
+font.serif     : Computer Modern
 #font.sans-serif     : DejaVu Sans, Bitstream Vera Sans, Computer Modern Sans Serif, Lucida Grande, Verdana, Geneva, Lucid, Arial, Helvetica, Avant Garde, sans-serif
 #font.cursive        : Apple Chancery, Textile, Zapf Chancery, Sand, Script MT, Felipa, cursive
 #font.fantasy        : Comic Sans MS, Chicago, Charcoal, ImpactWestern, Humor Sans, xkcd, fantasy
