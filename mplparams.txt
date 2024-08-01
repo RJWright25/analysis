@@ -508,7 +508,7 @@ ytick.alignment      : center_baseline ## alignment of yticks
 ## ***************************************************************************
 ## * GRIDS                                                                   *
 ## ***************************************************************************
-grid.color:     "#b0b0b0"  # grid color
+grid.color:     "k"  # grid color
 grid.linestyle: -          # solid
 grid.linewidth: 1        # in points
 grid.alpha:     0.1        # transparency, between 0.0 and 1.0
@@ -546,8 +546,8 @@ legend.loc:           best
 ## * FIGURE                                                                  *
 ## ***************************************************************************
 ## See https://matplotlib.org/stable/api/figure_api.html#matplotlib.figure.Figure
-figure.titlesize:   large     # size of the figure title (``Figure.suptitle()``)
-figure.labelsize:   large     # size of the figure label (``Figure.sup[x|y]label()``)
+figure.titlesize:   12     # size of the figure title (``Figure.suptitle()``)
+figure.labelsize:   12     # size of the figure label (``Figure.sup[x|y]label()``)
 figure.figsize:     5,4  # figure size in inches
 figure.dpi:         500       # figure dots per inch
 figure.facecolor:   white     # figure face color
