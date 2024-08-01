@@ -266,7 +266,7 @@ font.family:  serif
 #font.stretch: normal
 font.size:    8
 
-#font.serif:      Times New Roman, Times, Computer Modern Roman
+font.serif:      Times New Roman, Times, Computer Modern Roman
 #font.sans-serif: DejaVu Sans, Bitstream Vera Sans, Computer Modern Sans Serif, Lucida Grande, Verdana, Geneva, Lucid, Arial, Helvetica, Avant Garde, sans-serif
 #font.cursive:    Apple Chancery, Textile, Zapf Chancery, Sand, Script MT, Felipa, Comic Neue, Comic Sans MS, cursive
 #font.fantasy:    Chicago, Charcoal, Impact, Western, xkcd script, fantasy
@@ -310,7 +310,7 @@ font.size:    8
 ## ***************************************************************************
 ## For more information on LaTeX properties, see
 ## https://matplotlib.org/stable/users/explain/text/usetex.html
-text.usetex: False  # use latex for all text handling. The following fonts
+text.usetex: True  # use latex for all text handling. The following fonts
                      # are supported through the usual rc parameter settings:
                      # new century schoolbook, bookman, times, palatino,
                      # zapf chancery, charter, serif, sans-serif, helvetica,
