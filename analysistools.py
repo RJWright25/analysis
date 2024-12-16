@@ -48,7 +48,7 @@ def gen_bins(lo,hi,n=10,log=False):
 
 
 # Histogram with bootstrap-generated confidence intervals on bin counts
-def hist_bootstrap(x,x_edges=None,bs=100):
+def hist_bootstrap(x,x_edges=None,bs=100,subsets=2):
     
     """ 
     hist_bootstrap : function
@@ -98,7 +98,7 @@ def hist_bootstrap(x,x_edges=None,bs=100):
     output['Counts_PDF']=np.histogram(x,bins=x_edges,density=True)[0]
 
     #select random samples from x
-    x_samples=np.row_stack([np.random.choice(x,size=int(len(x)/2),replace=False) for ibs in range(bs)])
+    x_samples=np.row_stack([np.random.choice(x,size=int(len(x)/subsets),replace=False) for ibs in range(bs)])
 
     #calculate histogram for each sample
     x_samples_hist_density=np.zeros((bs,len(x_mid)))
@@ -135,7 +135,7 @@ def hist_bootstrap(x,x_edges=None,bs=100):
     output['Counts_Means']=np.mean(x_samples_hist_total,axis=0)
     output['Counts_lo_2sigma']=p2p5_total
     output['Counts_hi_2sigma']=p97p5_total
-    
+
 
     return output
 
