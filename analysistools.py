@@ -102,16 +102,24 @@ def hist_bootstrap(x,x_edges=None,bs=100):
 
     #calculate histogram for each sample
     x_samples_hist_density=np.zeros((bs,len(x_mid)))
+    x_samples_hist_total=np.zeros((bs,len(x_mid)))
 
     for i in range(bs):
         x_samples_hist_density[i]=np.histogram(x_samples[i],bins=x_edges,density=True)[0]
+        x_samples_hist_total[i]=np.histogram(x_samples[i],bins=x_edges)[0]
     
     #calculate percentiles of histogram
     #1st percentile of histogram
+
     p2p5=np.percentile(x_samples_hist_density,2.5,axis=0)
     p16=np.percentile(x_samples_hist_density,16,axis=0)
     p84=np.percentile(x_samples_hist_density,84,axis=0)
     p97p5=np.percentile(x_samples_hist_density,97.5,axis=0)
+
+    p2p5_total=np.percentile(x_samples_hist_total,2.5,axis=0)
+    p16_total=np.percentile(x_samples_hist_total,16,axis=0)
+    p84_total=np.percentile(x_samples_hist_total,84,axis=0)
+    p97p5_total=np.percentile(x_samples_hist_total,97.5,axis=0)
 
 
     output['Counts_PDF_lo_1sigma']=p16
@@ -120,6 +128,14 @@ def hist_bootstrap(x,x_edges=None,bs=100):
     output['Counts_PDF_Means']=np.mean(x_samples_hist_density,axis=0)
     output['Counts_PDF_lo_2sigma']=p2p5
     output['Counts_PDF_hi_2sigma']=p97p5
+
+    output['Counts_lo_1sigma']=p16_total
+    output['Counts_hi_1sigma']=p84_total
+    output['Counts_50P']=np.percentile(x_samples_hist_total,50,axis=0)
+    output['Counts_Means']=np.mean(x_samples_hist_total,axis=0)
+    output['Counts_lo_2sigma']=p2p5_total
+    output['Counts_hi_2sigma']=p97p5_total
+    
 
     return output
 
